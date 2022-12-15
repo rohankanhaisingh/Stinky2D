@@ -1,11 +1,12 @@
-import { AtanCalculation, Vector2, Vector3 } from "../typings";
+import { AtanCalculation, EasingName, Vector2, Vector3 } from "../typings";
+import { Easings } from "./easings";
 
 /**
  * Generates a random number between two numbers.
  * @param number1 Minimum rage number	
  * @param number2 Maximum rage number
 */
-export function RandomIntBeween(number1: number, number2: number): number {
+export function RandomIntBetween(number1: number, number2: number): number {
 
 	return Math.floor(Math.random() * (number2 - number1 + 1) + number1);
 }
@@ -43,10 +44,9 @@ export function GetAverageArrayValue(arr: number[]) {
 export function CalculateDistance(x1: number, y1: number, x2: number, y2: number) {
 
 
-    let d1 = x1 - x2,
-        d2 = y1 - y2,
-        //@ts-expect-error
-        distance = Math.sqrt(d1 * d1, d2 * d2);
+    let d1 = x2 - x1,
+        d2 = y2 - y1,
+        distance = Math.sqrt(d1 * d1 +  d2 * d2);
 
     return distance;
 }
@@ -99,9 +99,134 @@ export function CalculateIntersection(p1: Vector2, p2: Vector2, p3: Vector2, p4:
 }
 
 /**Creates a empty Vector2 object. */
-export function Vec2(x?: number, y?: number): Vector2 {
-    return { x: typeof x === "number" ? x : 0, y: typeof y === "number" ? y : 0 }
-}
+export class Vec2 implements Vector2 {
+
+    declare public x: number;
+    declare public y: number;
+
+    constructor(x?: number, y?: number) {
+
+        this.x = typeof x === "number" ? x : 0;
+        this.y = typeof y === "number" ? y : 0;
+
+    }
+
+    public Set(x: number | null, y: number | null) {
+        this.x = typeof x === "number" ? x : this.x;
+        this.y = typeof y === "number" ? y : this.y;
+        return this;
+    }
+
+    public Clone() {
+        return new Vec2(this.x, this.y);
+    }
+
+    public Multiply(value: Vector2 | Vec2) {
+
+        this.x *= value.x;
+        this.y *= value.y;
+
+        return this;
+    }
+
+    public MultiplyScalar(scalar: number) {
+
+        this.x *= scalar;
+        this.y *= scalar;
+
+        return this;
+    }
+
+    public Devide(value: Vector2 | Vec2) {
+
+        this.x /= value.x;
+        this.y /= value.y;
+
+        return this;
+    }
+
+    public Min(value: Vector2 | Vec2) {
+
+        this.x = Math.min(this.x, value.x);
+        this.y = Math.min(this.y, value.y);
+
+        return this;
+    }
+
+    public Max(value: Vector2 | Vec2) {
+
+        this.x = Math.max(this.x, value.x);
+        this.y = Math.max(this.y, value.y);
+
+        return this;
+    }
+
+    public Clamp(min: Vector2 | Vec2, max: Vector2 | Vec2) {
+
+        this.x = Math.max(min.x, Math.min(max.x, this.x));
+        this.y = Math.max(min.y, Math.min(max.y, this.y));
+
+        return this;
+    }
+
+    public ClampScalar(min: number, max: number) {
+
+        this.x = Math.max(min, Math.min(max, this.x));
+        this.y = Math.max(min, Math.min(max, this.y));
+
+        return this;
+    }
+
+    public Floor() {
+
+        this.x = Math.floor(this.x);
+        this.y = Math.floor(this.y);
+
+        return this;
+    }
+
+    public Ceil() {
+
+        this.x = Math.ceil(this.x);
+        this.y = Math.ceil(this.y);
+
+        return this;
+    }
+
+    public Round() {
+
+        this.x = Math.round(this.x);
+        this.y = Math.round(this.y);
+
+        return this;
+    }
+
+    public Dot(value: Vector2 | Vec2) {
+
+        return this.x * value.x + this.y * value.y;
+    }
+
+    public ComputeAngle() {
+
+        const angle = Math.atan2(- this.y, - this.x) + Math.PI;
+
+        return angle;
+    }
+
+    public RotateAround(center: Vector2 | Vec2, angle: number) {
+
+        const c: number = Math.cos(angle),
+            s: number = Math.sin(angle);
+
+        const x = this.x - center.x;
+        const y = this.y - center.y;
+
+        this.x = x * c - y * s + center.x;
+        this.y = x * s + y * c + center.y;
+
+        return this;
+    }
+} 
 
 export function Vec3(): Vector3 {
     return { x: 0, y: 0, z: 0 };
@@ -143,5 +268,33 @@ export function CalculateAtan(x1: number, y1: number, x2: number, y2: number): A
             }
         }
     }
+
+}
+
+export function AnimateInterger(from: number, to: number, easing: EasingName, duration: number, resultCallback: (value: number) => void) {
+
+    if (typeof from !== "number") throw new Error("Cannot animate integer because starting value is not defined.");
+    if (typeof to !== "number") throw new Error("Cannot animate integer because ending value is not defined.");
+    if (typeof duration !== "number") throw new Error("Cannot animate integer because duration value is not defined.");
+    if (typeof resultCallback !== "function") throw new Error("Cannot animate integer because callback function is not defined.");
+
+    const now: number = Date.now();
+
+    const updateTick = () => {
+
+        const elapsedTime = Date.now() - now;
+
+        const easingValue: number = Easings[easing](elapsedTime, 0, to - from, duration);
+
+        resultCallback(from + easingValue);
+
+        if (elapsedTime < duration) {
+            window.requestAnimationFrame(updateTick);
+        } else {
+            resultCallback(to);
+        }
+    }
+
+    updateTick();
 
 }

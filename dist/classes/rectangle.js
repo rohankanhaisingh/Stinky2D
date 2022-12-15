@@ -39,6 +39,8 @@ class Rectangle extends renderobject_1.RenderObject {
         this.y = y;
         this.width = width;
         this.height = height;
+        this.initialPosition = { x: x, y: y };
+        this.initialDimension = { width: width, height: height };
         this.styles = Object.assign({}, styles);
     }
     Draw(ctx) {

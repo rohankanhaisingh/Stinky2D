@@ -24,6 +24,7 @@ class Camera {
         this.scene = scene;
         this.ctx = renderer.context;
         renderer.camera = this;
+        scene.camera = this;
     }
     /**
      * Sets the camera offset, no idea why you need this but it's there :).

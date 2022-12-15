@@ -49,6 +49,9 @@ export class Rectangle extends RenderObject  implements RectangleConstructor{
 		this.width = width;
 		this.height = height;
 
+		this.initialPosition = { x: x, y: y };
+		this.initialDimension = { width: width, height: height };
+
 		this.styles = { ...styles };
 
 	}

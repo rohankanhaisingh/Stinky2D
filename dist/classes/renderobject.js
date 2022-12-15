@@ -20,6 +20,13 @@ class RenderObject {
         this.forceRendering = false;
         this.events = {};
         this.eventsOnce = {};
+        this.eventStates = {
+            hasEntered: false,
+            hasLeft: false,
+            hasClicked: false,
+            isDown: false,
+            isUp: false
+        };
         exports.AllExistingRenderObjects.push(this);
     }
     Draw(ctx) {
@@ -28,12 +35,68 @@ class RenderObject {
     Update(ctx, deltaTime) {
         return 0;
     }
+    _updateOnMouseOverEvent() {
+        const fixedMousePosition = this.scene.GetFixedMousePosition();
+        if (typeof this.width === "number" && typeof this.height === "number") {
+            const isInObject = fixedMousePosition.x >= this.x && fixedMousePosition.x <= this.x + this.width && fixedMousePosition.y >= this.y && fixedMousePosition.y <= this.y + this.height;
+            if (isInObject) {
+                if (!this.eventStates.hasEntered) {
+                    if (typeof this.events["mouseEnter"] === "function")
+                        this.events["mouseEnter"]({
+                            target: this,
+                            mousePosition: fixedMousePosition,
+                            mouse: this.scene.mouse
+                        });
+                    this.eventStates.hasLeft = false;
+                    this.eventStates.hasEntered = true;
+                }
+                if (this.scene.mouse.buttons.left || this.scene.mouse.buttons.middle || this.scene.mouse.buttons.right) {
+                    if (!this.eventStates.isDown) {
+                        if (typeof this.events["mouseDown"] === "function")
+                            this.events["mouseDown"]({
+                                target: this,
+                                mousePosition: fixedMousePosition,
+                                mouse: this.scene.mouse
+                            });
+                        this.eventStates.isDown = true;
+                    }
+                    this.eventStates.isDown = false;
+                    if (typeof this.events["mouseDown"] === "function")
+                        this.scene.mouse.buttons.resetState();
+                }
+                if (this.scene.mouse.wheelDirection !== null) {
+                    if (typeof this.events["mouseWheel"] === "function")
+                        this.events["mouseWheel"]({
+                            target: this,
+                            mousePosition: fixedMousePosition,
+                            mouse: this.scene.mouse
+                        });
+                    this.scene.mouse.wheelDirection = null;
+                }
+            }
+            else {
+                if (this.eventStates.hasClicked)
+                    this.eventStates.hasClicked = false;
+                if (this.eventStates.hasEntered) {
+                    if (typeof this.events["mouseOut"] === "function")
+                        this.events["mouseOut"]({
+                            target: this,
+                            mousePosition: fixedMousePosition,
+                            mouse: this.scene.mouse
+                        });
+                    this.eventStates.hasLeft = true;
+                    this.eventStates.hasEntered = false;
+                }
+            }
+        }
+    }
     // =============== Public shit ===============
     UpdateEvents() {
         if (typeof this.scene === "undefined" && typeof this.renderer === "undefined")
             return this;
         if (typeof this.renderer.camera === "undefined")
             return;
+        this._updateOnMouseOverEvent();
     }
     /**
      * Centers the render object based on the object's dimensions and position.
@@ -46,6 +109,30 @@ class RenderObject {
         this.x = x - (this.width / 2);
         this.y = y - (this.height / 2);
         return this;
+    }
+    /** Sets the position of this object using a method. */
+    SetPosition(x, y) {
+        if (typeof this.x !== "number")
+            throw new Error("Cannot set x-axis of object, as it does not exist or is not a number.");
+        if (typeof this.y !== "number")
+            throw new Error("Cannot set y-axis of object, as it does not exist or is not a number.");
+        this.x = x;
+        this.y = y;
+        return this;
+    }
+    SetFixedSize(width, height, position) {
+        if (typeof this.x !== "number")
+            throw new Error("Cannot set x-axis of object, as it does not exist or is not a number.");
+        if (typeof this.y !== "number")
+            throw new Error("Cannot set y-axis of object, as it does not exist or is not a number.");
+        if (typeof this.width !== "number")
+            throw new Error("Cannot set width of object, as it does not exist or is not a number.");
+        if (typeof this.height !== "number")
+            throw new Error("Cannot set height of object, as it does not exist or is not a number.");
+        this.width = width;
+        this.height = height;
+        this.x = position.x - (this.width / 2);
+        this.y = position.y - (this.height / 2);
     }
     /**
      * Changes the size using a method
@@ -265,12 +352,12 @@ class RenderObject {
      */
     AnimateCurrentRotation(to, easing, duration) {
         if (typeof this.rotation !== "number")
-            throw new Error("Cannot animate x-axis of object as it does not exist or is not a number.");
+            throw new Error("Cannot animate rotation of object as it does not exist or is not a number.");
         const now = Date.now();
         const startRotation = this.rotation;
         const updateTick = () => {
             const elapsedTime = Date.now() - now;
-            const easingValue = easings_1.Easings[easing](elapsedTime, 0, to - now, duration);
+            const easingValue = easings_1.Easings[easing](elapsedTime, 0, to - startRotation, duration);
             this.rotation = startRotation + easingValue;
             if (elapsedTime < duration)
                 window.requestAnimationFrame(updateTick);
@@ -291,6 +378,9 @@ class RenderObject {
         if (typeof cb !== "function")
             throw new Error("Cannot add event since callback argument is not a function type.");
         this.events[event] = cb;
+        if (event === "mouseUp" || event === "mouseClick") {
+            throw new Error(`Failed to set ${event} event listener on object id ${this.id}.`);
+        }
         return this;
     }
     // =============== Static methods ===============
@@ -301,6 +391,8 @@ class RenderObject {
             ctx.direction = styles.direction;
         if (typeof styles.backgroundColor === "string")
             ctx.fillStyle = styles.backgroundColor;
+        if (typeof styles.textColor === "string")
+            ctx.fillStyle = styles.textColor;
         if (typeof styles.filter === "string")
             ctx.filter = styles.filter;
         if (typeof styles.font === "string")
@@ -323,8 +415,16 @@ class RenderObject {
             ctx.miterLimit = styles.miterLimit;
         if (typeof styles.borderWidth === "number")
             ctx.lineWidth = styles.borderWidth;
+        if (typeof styles.strokeWidth === "number")
+            ctx.lineWidth = styles.strokeWidth;
+        if (typeof styles.lineWidth === "number")
+            ctx.lineWidth = styles.lineWidth;
         if (typeof styles.borderColor === "string")
             ctx.strokeStyle = styles.borderColor;
+        if (typeof styles.strokeColor === "string")
+            ctx.strokeStyle = styles.strokeColor;
+        if (typeof styles.textStrokeColor === "string")
+            ctx.strokeStyle = styles.textStrokeColor;
         if (typeof styles.shadowBlur === "number")
             ctx.shadowBlur = styles.shadowBlur;
         if (typeof styles.shadowColor === "string")

@@ -1,7 +1,15 @@
-export declare type UniqueIDFilterKeywords = "numbers" | "letters" | "lettersUpperCase" | "lettersLowerCase";
-export declare type DragOffsetType = "center" | "offset";
-export declare type DragMouseButton = "left" | "middle" | "right";
-export declare type EasingName = "easeInQuad" | "easeOutQuad" | "easeInOutQuad" | "easeInCubic" | "easeOutCubic" | "easeInOutCubic" | "easeInQuart" | "easeOutQuart" | "easeInOutQuart" | "easeInQuint" | "easeOutQuint" | "easeInOutQuint" | "easeInSine" | "easeOutSine" | "easeInOutSine" | "easeInExpo" | "easeOutExpo" | "easeInOutExpo" | "easeInCirc" | "easeOutCirc" | "easeInOutCirc" | "easeInElastic" | "easeOutElastic" | "easeInOutElastic" | "easeInBack" | "easeOutBack" | "easeInOutBack" | "easeInBounce" | "easeOutBounce" | "easeInOutBounce";
+import { RenderObject } from "./classes/renderobject";
+export type UniqueIDFilterKeywords = "numbers" | "letters" | "lettersUpperCase" | "lettersLowerCase";
+export type DragOffsetType = "center" | "offset";
+export type DragMouseButton = "left" | "middle" | "right";
+export type EasingName = "easeInQuad" | "easeOutQuad" | "easeInOutQuad" | "easeInCubic" | "easeOutCubic" | "easeInOutCubic" | "easeInQuart" | "easeOutQuart" | "easeInOutQuart" | "easeInQuint" | "easeOutQuint" | "easeInOutQuint" | "easeInSine" | "easeOutSine" | "easeInOutSine" | "easeInExpo" | "easeOutExpo" | "easeInOutExpo" | "easeInCirc" | "easeOutCirc" | "easeInOutCirc" | "easeInElastic" | "easeOutElastic" | "easeInOutElastic" | "easeInBack" | "easeOutBack" | "easeInOutBack" | "easeInBounce" | "easeOutBounce" | "easeInOutBounce";
+export type RenderObjectEvents = "mouseDown" | "mouseUp" | "mouseMove" | "mouseOut" | "mouseEnter" | "mouseClick" | "mouseWheel" | "render" | "update" | "exist" | "destroy";
+export type SceneAttributes = "keepSizeToWindow" | "disableContextMenu" | "redrawOnResize";
+export type SceneMouseWheelDirection = "up" | "down" | "left" | "right" | null;
+export type SceneEvents = "sceneResize" | "mouseDown" | "mouseUp" | "mouseMove" | "mouseOut" | "mouseEnter" | "mouseWheel";
+export type SceneImageFormat = "png" | "webp" | "jpeg" | "jpg";
+export type LooperOnUpdateEvent = (state: LooperTickState) => void;
+export type LooperEventNames = "update";
 export interface GeneratedUniqueIDObject {
     readonly id: string;
     readonly timestamp: number;
@@ -24,14 +32,11 @@ export interface AtanCalculation {
     complete: () => Vector2;
     multiply: (len: number) => Vector2;
 }
-export declare type SceneAttributes = "keepSizeToWindow" | "disableContextMenu" | "redrawOnResize";
-export declare type SceneMouseWheelDirection = "up" | "down" | "left" | "right" | null;
-export declare type SceneEvents = "sceneResize" | "mouseDown" | "mouseUp" | "mouseMove" | "mouseOut" | "mouseEnter" | "mouseWheel";
-export declare type SceneImageFormat = "png" | "webp" | "jpeg" | "jpg";
 export interface SceneMouseButtonsObject {
     right: boolean;
     middle: boolean;
     left: boolean;
+    resetState: () => void;
 }
 export interface SceneMouseObject {
     x: number;
@@ -87,8 +92,8 @@ export interface SceneConstructor {
     canvasElement: HTMLCanvasElement;
     domElement: HTMLElement;
     renderer?: RendererConstructor;
+    camera?: CameraConstructor;
 }
-export declare type RenderObjectEvents = "mouseDown" | "mouseUp" | "mouseMove" | "mouseOut" | "mouseEnter" | "mouseClick" | "render" | "update" | "exist" | "destroy";
 export interface RenderObjectConstructor {
     id: string;
     exisitingObjectCount: number;
@@ -153,20 +158,23 @@ export interface RenderObjectStyles {
     shadowOffsetY?: number;
     direction?: CanvasDirection;
     font?: string;
+    textColor?: string;
+    textStrokeColor?: string;
     lineCap?: CanvasLineCap;
     lineDashOffset?: number;
     lineJoin?: CanvasLineJoin;
     miterLimit?: number;
     textAlign?: CanvasTextAlign;
     textBaseline?: CanvasTextBaseline;
+    strokeColor?: string;
+    strokeWidth?: number;
+    lineWidth?: number;
 }
 export interface RenderObjectStyleApplyingResults {
     startedAt: number;
     endedAt: number;
     duration: number;
 }
-export declare type LooperOnUpdateEvent = (state: LooperTickState) => void;
-export declare type LooperEventNames = "update";
 export interface LooperConstructor {
     id: string;
     renderer: RendererConstructor;
@@ -194,4 +202,61 @@ export interface RectangleDragConfiguration {
     offsetType: DragOffsetType | null;
     scene: SceneConstructor | null;
     button: DragMouseButton;
+}
+export interface TextConstructor {
+    text: string;
+    showBoundary: boolean;
+}
+export interface CircleConstructor {
+    x: number;
+    y: number;
+    radius: number;
+    startRadian: number;
+    endRadian: number;
+    counterClockwise: boolean;
+}
+export interface Geometry2DConstructor {
+    segments: Vector2[];
+}
+export interface Geometry2DStyles {
+    backgroundColor?: string;
+    borderColor?: string;
+}
+export interface Line2DConstructor {
+    from: Vector2;
+    to: Vector2;
+    styles: RenderObjectStyles;
+    id: string;
+}
+export interface LineSystem2DOptions {
+    maxLines?: number;
+}
+export interface LineSystem2DConstructor {
+    options: LineSystem2DOptions;
+    lines: Line2DConstructor[];
+}
+export interface RenderObjectEventObject {
+    readonly target: RenderObject;
+    readonly mousePosition: Vector2;
+    readonly mouse: SceneMouseObject;
+}
+export interface Dimension2D {
+    width?: number;
+    height?: number;
+    radius?: number;
+}
+export interface SpritesheetControllerConstructor {
+    frames: HTMLImageElement[];
+    duration: number;
+    frameDimension: Dimension2D;
+    loop: boolean;
+    frameDuration: number;
+}
+export interface SpritesheetControllerEventObject {
+    reset?: (timestamp: number) => void;
+    play?: (timestamp: number) => void;
+    pause?: (timestamp: number) => void;
+    update?: (timestamp: number) => void;
+    detach?: (timestamp: number) => void;
+    attach?: (timestamp: number) => void;
 }

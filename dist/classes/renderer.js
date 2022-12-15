@@ -73,7 +73,7 @@ class Renderer {
             if (!this.camera.offScreenRendering) {
                 if (typeof obj.width === "number" && typeof obj.height === "number") {
                     if (!obj.forceRendering) {
-                        if (obj.x > -(((this.camera.x + 30) / this.camera.scaleX) + obj.width) && obj.x < -((this.camera.x - this.camera.width) / this.camera.scaleX) &&
+                        if (obj.x > -(((this.camera.x + 30) / this.camera.scaleX) + (obj.width)) && obj.x < -((this.camera.x - this.camera.width) / this.camera.scaleX) &&
                             obj.y > -((this.camera.y + 30) / this.camera.scaleY) && obj.y < -((this.camera.y - (this.camera.height))) / this.camera.scaleY) {
                             visibleObjects.push(obj);
                             obj.visible = true;
@@ -81,6 +81,8 @@ class Renderer {
                                 obj.Draw(this.context);
                             if (typeof obj.Update === "function")
                                 obj.Update(this.context, deltaTime);
+                            if (obj.spritesheetController)
+                                obj.spritesheetController.Update(deltaTime);
                         }
                         else {
                             obj.visible = false;
@@ -91,6 +93,36 @@ class Renderer {
                             obj.Draw(this.context);
                         if (typeof obj.Update === "function")
                             obj.Update(this.context, deltaTime);
+                        if (obj.spritesheetController)
+                            obj.spritesheetController.Update(deltaTime);
+                        visibleObjects.push(obj);
+                        obj.visible = false;
+                    }
+                }
+                if (typeof obj.radius === "number") {
+                    if (!obj.forceRendering) {
+                        if (obj.x > -(((this.camera.x + 30) / this.camera.scaleX) + (obj.radius)) && obj.x < -((this.camera.x - this.camera.width) / this.camera.scaleX) &&
+                            obj.y > -((this.camera.y + 30) / this.camera.scaleY) && obj.y < -((this.camera.y - (this.camera.height))) / this.camera.scaleY) {
+                            visibleObjects.push(obj);
+                            obj.visible = true;
+                            if (typeof obj.Draw === "function")
+                                obj.Draw(this.context);
+                            if (typeof obj.Update === "function")
+                                obj.Update(this.context, deltaTime);
+                            if (obj.spritesheetController)
+                                obj.spritesheetController.Update(deltaTime);
+                        }
+                        else {
+                            obj.visible = false;
+                        }
+                    }
+                    else {
+                        if (typeof obj.Draw === "function")
+                            obj.Draw(this.context);
+                        if (typeof obj.Update === "function")
+                            obj.Update(this.context, deltaTime);
+                        if (obj.spritesheetController)
+                            obj.spritesheetController.Update(deltaTime);
                         visibleObjects.push(obj);
                         obj.visible = false;
                     }
@@ -101,9 +133,12 @@ class Renderer {
                     obj.Draw(this.context);
                 if (typeof obj.Update === "function")
                     obj.Update(this.context, deltaTime);
+                if (obj.spritesheetController)
+                    obj.spritesheetController.Update(deltaTime);
             }
             i += 1;
         }
+        this.visibleRenderObjects = visibleObjects;
         ctx.restore();
         results.renderedAmountOfObjects = visibleObjects.length;
         results.endedAt = Date.now();
@@ -128,7 +163,7 @@ class Renderer {
         renderObject.scene = this.scene;
         renderObject.renderer = this;
         this.renderObjects.push(renderObject);
-        return this;
+        return renderObject;
     }
     Destroy(renderObject) {
         for (let i = 0; i < this.renderObjects.length; i++) {

@@ -1,14 +1,19 @@
-import { SceneAttributes, SceneConstructor, SceneEvents, SceneImageFormat, SceneMouseObject } from "../typings";
+import { CameraConstructor, RendererConstructor, SceneAttributes, SceneConstructor, SceneEvents, SceneImageFormat, SceneMouseObject, Vector2 } from "../typings";
+import { Camera } from "./camera";
+import { Renderer } from "./renderer";
 export declare class Scene implements SceneConstructor {
     width: number;
     height: number;
     domElement: HTMLElement;
     canvasElement: HTMLCanvasElement;
+    id: string;
     events: {
         [key: string]: Function;
     };
     attributes: SceneAttributes[];
     mouse: SceneMouseObject;
+    camera: Camera | CameraConstructor;
+    renderer: Renderer | RendererConstructor;
     /**
      * Creates a scene in which graphical elements are rendered. This is a required component within the program.
      * @param width
@@ -50,4 +55,5 @@ export declare class Scene implements SceneConstructor {
      * @param event
      */
     RemoveEventListener(event: SceneEvents): boolean;
+    GetFixedMousePosition(): Vector2;
 }

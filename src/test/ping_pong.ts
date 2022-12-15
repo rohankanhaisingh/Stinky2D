@@ -25,7 +25,8 @@ function createPlayers() {
 	});
 
 
-	renderer.Add(player1).Add(player2);
+	renderer.Add(player1);
+	renderer.Add(player2);
 }
 
 function createScene() {

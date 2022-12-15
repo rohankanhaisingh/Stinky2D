@@ -4,7 +4,7 @@
  *
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Vec3 = exports.Vec2 = exports.GetAverageArrayValue = exports.CalculateIntersection = exports.CalculateDistance = exports.CalculateAtan = exports.CalculateAngle = exports.RandomIntBeween = exports.Easings = exports.LoadImageSync = exports.WaitFor = exports.UniqueID = exports.ConvertByteArrayToHex = exports.ConvertHexToByteArray = exports.RandomColor = exports.ColorCodes = exports.Rectangle = exports.Looper = exports.Camera = exports.Renderer = exports.AllExistingRenderObjects = exports.RenderObject = exports.Scene = void 0;
+exports.AnimateInterger = exports.Vec3 = exports.Vec2 = exports.GetAverageArrayValue = exports.CalculateIntersection = exports.CalculateDistance = exports.CalculateAtan = exports.CalculateAngle = exports.RandomIntBetween = exports.Easings = exports.LoadImageSync = exports.WaitFor = exports.UniqueID = exports.ConvertByteArrayToHex = exports.ConvertHexToByteArray = exports.RandomColor = exports.ColorCodes = exports.SpritesheetController = exports.LineSystem2D = exports.Line2D = exports.Geometry2D = exports.Circle = exports.TextNode = exports.Rectangle = exports.Looper = exports.Camera = exports.Renderer = exports.AllExistingRenderObjects = exports.RenderObject = exports.Scene = void 0;
 var scene_1 = require("./classes/scene");
 Object.defineProperty(exports, "Scene", { enumerable: true, get: function () { return scene_1.Scene; } });
 var renderobject_1 = require("./classes/renderobject");
@@ -18,6 +18,17 @@ var looper_1 = require("./classes/looper");
 Object.defineProperty(exports, "Looper", { enumerable: true, get: function () { return looper_1.Looper; } });
 var rectangle_1 = require("./classes/rectangle");
 Object.defineProperty(exports, "Rectangle", { enumerable: true, get: function () { return rectangle_1.Rectangle; } });
+var text_1 = require("./classes/text");
+Object.defineProperty(exports, "TextNode", { enumerable: true, get: function () { return text_1.TextNode; } });
+var circle_1 = require("./classes/circle");
+Object.defineProperty(exports, "Circle", { enumerable: true, get: function () { return circle_1.Circle; } });
+var geometry_2d_1 = require("./classes/geometry-2d");
+Object.defineProperty(exports, "Geometry2D", { enumerable: true, get: function () { return geometry_2d_1.Geometry2D; } });
+var linesystem_1 = require("./classes/linesystem");
+Object.defineProperty(exports, "Line2D", { enumerable: true, get: function () { return linesystem_1.Line2D; } });
+Object.defineProperty(exports, "LineSystem2D", { enumerable: true, get: function () { return linesystem_1.LineSystem2D; } });
+var spritesheet_controller_1 = require("./classes/spritesheet-controller");
+Object.defineProperty(exports, "SpritesheetController", { enumerable: true, get: function () { return spritesheet_controller_1.SpritesheetController; } });
 var colors_1 = require("./constants/colors");
 Object.defineProperty(exports, "ColorCodes", { enumerable: true, get: function () { return colors_1.ColorCodes; } });
 Object.defineProperty(exports, "RandomColor", { enumerable: true, get: function () { return colors_1.RandomColor; } });
@@ -31,7 +42,7 @@ Object.defineProperty(exports, "LoadImageSync", { enumerable: true, get: functio
 var easings_1 = require("./functions/easings");
 Object.defineProperty(exports, "Easings", { enumerable: true, get: function () { return easings_1.Easings; } });
 var math_1 = require("./functions/math");
-Object.defineProperty(exports, "RandomIntBeween", { enumerable: true, get: function () { return math_1.RandomIntBeween; } });
+Object.defineProperty(exports, "RandomIntBetween", { enumerable: true, get: function () { return math_1.RandomIntBetween; } });
 Object.defineProperty(exports, "CalculateAngle", { enumerable: true, get: function () { return math_1.CalculateAngle; } });
 Object.defineProperty(exports, "CalculateAtan", { enumerable: true, get: function () { return math_1.CalculateAtan; } });
 Object.defineProperty(exports, "CalculateDistance", { enumerable: true, get: function () { return math_1.CalculateDistance; } });
@@ -39,3 +50,4 @@ Object.defineProperty(exports, "CalculateIntersection", { enumerable: true, get:
 Object.defineProperty(exports, "GetAverageArrayValue", { enumerable: true, get: function () { return math_1.GetAverageArrayValue; } });
 Object.defineProperty(exports, "Vec2", { enumerable: true, get: function () { return math_1.Vec2; } });
 Object.defineProperty(exports, "Vec3", { enumerable: true, get: function () { return math_1.Vec3; } });
+Object.defineProperty(exports, "AnimateInterger", { enumerable: true, get: function () { return math_1.AnimateInterger; } });

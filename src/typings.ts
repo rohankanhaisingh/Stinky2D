@@ -1,10 +1,17 @@
-// =============== Utilties ===============
-
+import { RenderObject } from "./classes/renderobject";
 
 export type UniqueIDFilterKeywords = "numbers" | "letters" | "lettersUpperCase" | "lettersLowerCase";
 export type DragOffsetType = "center" | "offset";
 export type DragMouseButton = "left" | "middle" | "right";
 export type EasingName = "easeInQuad" | "easeOutQuad" | "easeInOutQuad" | "easeInCubic" | "easeOutCubic" | "easeInOutCubic" | "easeInQuart" | "easeOutQuart" | "easeInOutQuart" | "easeInQuint" | "easeOutQuint" | "easeInOutQuint" | "easeInSine" | "easeOutSine" | "easeInOutSine" | "easeInExpo" | "easeOutExpo" | "easeInOutExpo" | "easeInCirc" | "easeOutCirc" | "easeInOutCirc" | "easeInElastic" | "easeOutElastic" | "easeInOutElastic" | "easeInBack" | "easeOutBack" | "easeInOutBack" | "easeInBounce" | "easeOutBounce" | "easeInOutBounce";
+export type RenderObjectEvents = "mouseDown" | "mouseUp" | "mouseMove" | "mouseOut" | "mouseEnter" | "mouseClick" | "mouseWheel" | "render" | "update" | "exist" | "destroy"; 
+export type SceneAttributes = "keepSizeToWindow" | "disableContextMenu" | "redrawOnResize";
+export type SceneMouseWheelDirection = "up" | "down" | "left" | "right" | null;
+export type SceneEvents = "sceneResize" | "mouseDown" | "mouseUp" | "mouseMove" | "mouseOut" | "mouseEnter" | "mouseWheel";
+export type SceneImageFormat = "png" | "webp" | "jpeg" | "jpg";
+export type LooperOnUpdateEvent = (state: LooperTickState) => void;
+export type LooperEventNames = "update";
+
 
 /*
  * Interface representing an object that will be returned
@@ -39,13 +46,6 @@ export interface AtanCalculation {
 	multiply: (len: number) => Vector2;
 }
 
-// =============== Scene typings  ===============
-
-export type SceneAttributes = "keepSizeToWindow" | "disableContextMenu" | "redrawOnResize";
-export type SceneMouseWheelDirection = "up" | "down" | "left" | "right" | null;
-export type SceneEvents = "sceneResize" | "mouseDown" | "mouseUp" | "mouseMove" | "mouseOut" | "mouseEnter" | "mouseWheel";
-export type SceneImageFormat = "png" | "webp" | "jpeg" | "jpg";
-
 /*
  * This interface represents an object with properties
  * based on a generic mouse with three buttons: left, middle and right.
@@ -54,6 +54,7 @@ export interface SceneMouseButtonsObject {
 	right: boolean;
 	middle: boolean;
 	left: boolean;
+	resetState: () => void;
 }
 
 /*
@@ -121,20 +122,13 @@ export interface MouseEnterObject {
  * This interface specifies the standard class members.
  */
 export interface SceneConstructor {
-
 	width: number;
 	height: number;
-	
 	canvasElement: HTMLCanvasElement;
 	domElement: HTMLElement;
-
 	renderer?: RendererConstructor;
+	camera?: CameraConstructor;
 }
-
-// =============== Renderobject typings  ===============
-
-export type RenderObjectEvents = "mouseDown" | "mouseUp" | "mouseMove" | "mouseOut" | "mouseEnter" | "mouseClick" | "render" | "update" | "exist" | "destroy"; 
-
 /*
  * Interface that will be implemented in a 'RenderObject' class instance,
  * including standard specified class members.
@@ -145,9 +139,6 @@ export interface RenderObjectConstructor {
 	exisitingObjectCount: number;
 	timestamp: number;
 }
-
-
-// =============== Renderer typings  ===============
 
 /*
  * Interface that represents an object that can be used
@@ -183,8 +174,6 @@ export interface Rendering {
 	renderedAmountOfObjects: number;
 }
 
-// =============== Camera typings  ===============
-
 export interface CameraConstructor {
 	renderer: RendererConstructor;
 	ctx: CanvasRenderingContext2D;
@@ -198,8 +187,6 @@ export interface CameraConstructor {
 	offScreenRendering: boolean;
 	lastOffset: Vector2;
 }
-
-// =============== Default rendering typings ===============
 
 /*
  * Interface representing an object with transform matrices,
@@ -234,12 +221,17 @@ export interface RenderObjectStyles {
 	shadowOffsetY?: number;
 	direction?: CanvasDirection;
 	font?: string;
+	textColor?: string;
+	textStrokeColor?: string;
 	lineCap?: CanvasLineCap;
 	lineDashOffset?: number;
 	lineJoin?: CanvasLineJoin;
 	miterLimit?: number;
 	textAlign?: CanvasTextAlign;
 	textBaseline?: CanvasTextBaseline;
+	strokeColor?: string;
+	strokeWidth?: number;
+	lineWidth?: number;
 }
 
 export interface RenderObjectStyleApplyingResults {
@@ -247,11 +239,6 @@ export interface RenderObjectStyleApplyingResults {
 	endedAt: number;
 	duration: number;
 }
-
-// =============== Looper typings  ===============
-
-export type LooperOnUpdateEvent = (state: LooperTickState) => void;
-export type LooperEventNames = "update";
 
 export interface LooperConstructor {
 	id: string;
@@ -274,8 +261,6 @@ export interface LooperEvents {
 	update: LooperOnUpdateEvent[];
 }
 
-// =============== Rectangle typings ===============
-
 export interface RectangleConstructor {
 	id: string;
 	timestamp: number;
@@ -291,4 +276,72 @@ export interface RectangleDragConfiguration {
 	offsetType: DragOffsetType | null;
 	scene: SceneConstructor | null;
 	button: DragMouseButton;
+}
+
+export interface TextConstructor {
+	text: string;
+	showBoundary: boolean;
+}
+
+export interface CircleConstructor {
+	x: number;
+	y: number;
+	radius: number;
+	startRadian: number;
+	endRadian: number;
+	counterClockwise: boolean;
+}
+
+export interface Geometry2DConstructor {
+	segments: Vector2[];
+}
+
+export interface Geometry2DStyles {
+	backgroundColor?: string;
+	borderColor?: string;
+}
+
+export interface Line2DConstructor {
+	from: Vector2;
+	to: Vector2;
+	styles: RenderObjectStyles;
+	id: string;
+}
+
+export interface LineSystem2DOptions {
+	maxLines?: number;
+}
+
+export interface LineSystem2DConstructor {
+	options: LineSystem2DOptions;
+	lines: Line2DConstructor[];
+}
+
+export interface RenderObjectEventObject {
+	readonly target: RenderObject;
+	readonly mousePosition: Vector2;
+	readonly mouse: SceneMouseObject;
+}
+
+export interface Dimension2D {
+	width?: number;
+	height?: number;
+	radius?: number;
+}
+
+export interface SpritesheetControllerConstructor {
+	frames: HTMLImageElement[];
+	duration: number;
+	frameDimension: Dimension2D;
+	loop: boolean;
+	frameDuration: number;
+}
+
+export interface SpritesheetControllerEventObject {
+	reset?: (timestamp: number) => void;
+	play?: (timestamp: number) => void;
+	pause?: (timestamp: number) => void;
+	update?: (timestamp: number) => void;
+	detach?: (timestamp: number) => void;
+	attach?: (timestamp: number) => void;
 }

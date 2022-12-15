@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Scene = void 0;
+const uid_1 = require("../functions/uid");
 function createMouseObject() {
     return {
         x: 0,
@@ -9,7 +10,12 @@ function createMouseObject() {
         buttons: {
             left: false,
             middle: false,
-            right: false
+            right: false,
+            resetState: function () {
+                this.left = false;
+                this.middle = false;
+                this.right = false;
+            }
         },
         checkObjectEntry: function (x, y, range) {
             if (x >= this.x - range && x <= this.x + range && y >= this.y - range && y <= this.y + range) {
@@ -32,6 +38,7 @@ class Scene {
      * @param attributes
      */
     constructor(width, height, domElement, attributes) {
+        this.id = (0, uid_1.UniqueID)(18).id;
         this.events = {};
         this.width = width;
         this.height = height;
@@ -45,6 +52,10 @@ class Scene {
         canvas.width = width;
         canvas.height = height;
         canvas.setAttribute("crossOrigin", "anonymous");
+        canvas.setAttribute("scene-id", this.id);
+        canvas.setAttribute("scene-type", "2d");
+        canvas.setAttribute("enable-mouse-tracking", "true");
+        canvas.setAttribute("enable-keyboard-tracking", "true");
         domElement.appendChild(canvas);
         this.canvasElement = canvas;
         this._handleMouseEvents();
@@ -52,11 +63,11 @@ class Scene {
     }
     _handleMouseEvents() {
         this.canvasElement.addEventListener("mousemove", event => {
-            const now = performance.now(), deltaTime = now - this.mouse.lastTimestamp, distanceX = Math.abs(event.offsetX - this.mouse.x), speedX = Math.round(distanceX / deltaTime * 1000), distanceY = Math.abs(event.offsetY - this.mouse.y), speedY = Math.round(distanceY / deltaTime * 1000);
+            const now = performance.now(), deltaTime = now - this.mouse.lastTimestamp, distanceX = Math.abs(event.clientX - this.mouse.x), speedX = Math.round(distanceX / deltaTime * 1000), distanceY = Math.abs(event.clientY - this.mouse.y), speedY = Math.round(distanceY / deltaTime * 1000);
             this.mouse.velocityX = speedX;
             this.mouse.velocityY = speedY;
-            this.mouse.x = event.offsetX;
-            this.mouse.y = event.offsetY;
+            this.mouse.x = event.clientX;
+            this.mouse.y = event.clientY;
             this.mouse.lastTimestamp = now;
             if (typeof this.events["mouseMove"] === "function")
                 this.events["mouseMove"]({
@@ -218,6 +229,17 @@ class Scene {
             return false;
         delete this.events[event];
         return true;
+    }
+    GetFixedMousePosition() {
+        if (!this.camera)
+            return {
+                x: this.mouse.x,
+                y: this.mouse.y
+            };
+        return {
+            x: (this.mouse.x - this.camera.x) / this.camera.scaleX,
+            y: (this.mouse.y - this.camera.y) / this.camera.scaleY,
+        };
     }
 }
 exports.Scene = Scene;

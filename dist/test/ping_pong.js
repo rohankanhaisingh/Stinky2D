@@ -17,7 +17,8 @@ function createPlayers() {
     const player2 = new index_1.Rectangle(sceneWidth - (playerWidth * 2), sceneHeight / 2, playerWidth, 120, {
         backgroundColor: index_1.ColorCodes.BLACK
     });
-    renderer.Add(player1).Add(player2);
+    renderer.Add(player1);
+    renderer.Add(player2);
 }
 function createScene() {
     const sceneBorder = new index_1.Rectangle(0, 0, sceneWidth, sceneHeight, {

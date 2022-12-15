@@ -6,7 +6,7 @@ export declare class Renderer implements RendererConstructor {
     id: string;
     timestamp: number;
     renderObjects: RenderObject[];
-    visibleRenderObjects: never[];
+    visibleRenderObjects: RenderObject[];
     attributes: {};
     transform: TransformMatrices | null;
     scene: Scene | SceneConstructor;
@@ -38,6 +38,6 @@ export declare class Renderer implements RendererConstructor {
      * An error might be thrown if an instance already has been added to this renderer.
      * @param renderObject
     */
-    Add(renderObject: RenderObject): Renderer;
+    Add(renderObject: RenderObject): RenderObject;
     Destroy(renderObject: RenderObject): Renderer;
 }

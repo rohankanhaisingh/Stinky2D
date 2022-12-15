@@ -1,9 +1,10 @@
 import { ConvertByteArrayToHex, ConvertHexToByteArray, FixedHexToRgbArray } from "../constants/colors";
 import { Easings } from "../functions/easings";
 import { UniqueID } from "../functions/uid";
-import { EasingName, RenderObjectConstructor, RenderObjectEvents, RenderObjectStyleApplyingResults, RenderObjectStyles, Vector2 } from "../typings";
+import { Dimension2D, EasingName, RenderObjectConstructor, RenderObjectEventObject, RenderObjectEvents, RenderObjectStyleApplyingResults, RenderObjectStyles, SpritesheetControllerConstructor, Vector2 } from "../typings";
 import { Renderer } from "./renderer";
 import { Scene } from "./scene";
+import { SpritesheetController } from "./spritesheet-controller";
 
 function checkSquareProperties(obj: RenderObject) {
 
@@ -25,20 +26,37 @@ export class RenderObject implements RenderObjectConstructor {
 	public visible: boolean = true;
 	public forceRendering: boolean = false;
 
-	public events: {[key: string]: Function} = {};
-	public eventsOnce: {[key: string]: Function} = {};
+	public events: {[key: string]: (event: RenderObjectEventObject) => void} = {};
+	public eventsOnce: { [key: string]: Function } = {};
+	public eventStates = {
+		hasEntered: false,
+		hasLeft: false,
+		hasClicked: false,
+		isDown: false,
+		isUp: false
+	};
 
 	declare public x: number;
 	declare public y: number;
 	declare public width: number;
 	declare public height: number;
 	declare public radius: number;
-	declare public segments: number[];
+	declare public segments: Vector2[];
 	declare public styles: RenderObjectStyles;
 	declare public rotation: number;
 
+	declare public velocityX: number;
+	declare public velocityY: number;
+	declare public gravitationalAcceleration: number;
+	declare public objectWeight: number;
+
 	declare public scene: Scene;
 	declare public renderer: Renderer;
+
+	declare public initialPosition: Vector2;
+	declare public initialDimension: Dimension2D;
+
+	declare public spritesheetController?: SpritesheetController | SpritesheetControllerConstructor;
 
 	constructor() {
 
@@ -54,16 +72,88 @@ export class RenderObject implements RenderObjectConstructor {
 		return 0;
 	}
 
-	// =============== Public shit ===============
+	private _updateOnMouseOverEvent() {
 
+		const fixedMousePosition: Vector2 = this.scene.GetFixedMousePosition();
+
+
+		if (typeof this.width === "number" && typeof this.height === "number") {
+
+			const isInObject: boolean = fixedMousePosition.x >= this.x && fixedMousePosition.x <= this.x + this.width && fixedMousePosition.y >= this.y && fixedMousePosition.y <= this.y + this.height;
+			
+			if (isInObject) {
+
+				if (!this.eventStates.hasEntered) {
+
+					if (typeof this.events["mouseEnter"] === "function") this.events["mouseEnter"]({
+						target: this,
+						mousePosition: fixedMousePosition,
+						mouse: this.scene.mouse
+					});
+
+					this.eventStates.hasLeft = false;
+					this.eventStates.hasEntered = true;
+				}
+
+				if (this.scene.mouse.buttons.left || this.scene.mouse.buttons.middle || this.scene.mouse.buttons.right) {
+
+					if (!this.eventStates.isDown) {
+
+						if (typeof this.events["mouseDown"] === "function") this.events["mouseDown"]({
+							target: this,
+							mousePosition: fixedMousePosition,
+							mouse: this.scene.mouse
+						});
+
+						this.eventStates.isDown = true;
+					}
+
+					this.eventStates.isDown = false;
+
+					if (typeof this.events["mouseDown"] === "function") this.scene.mouse.buttons.resetState();
+				} 
+
+				if (this.scene.mouse.wheelDirection !== null) {
+
+					if (typeof this.events["mouseWheel"] === "function") this.events["mouseWheel"]({
+						target: this,
+						mousePosition: fixedMousePosition,
+						mouse: this.scene.mouse
+					});
+
+					this.scene.mouse.wheelDirection = null;
+				}
+
+			} else {
+
+				if (this.eventStates.hasClicked) this.eventStates.hasClicked = false;
+
+				if (this.eventStates.hasEntered) {
+
+					if (typeof this.events["mouseOut"] === "function") this.events["mouseOut"]({
+						target: this,
+						mousePosition: fixedMousePosition,
+						mouse: this.scene.mouse
+					});
+
+					this.eventStates.hasLeft = true;
+					this.eventStates.hasEntered = false;
+				}
+
+			}
+
+		}
+
+	}
+
+	// =============== Public shit ===============
 
 	public UpdateEvents() {
 
 		if (typeof this.scene === "undefined" && typeof this.renderer === "undefined") return this;
 		if (typeof this.renderer.camera === "undefined") return;
 
-
-		
+		this._updateOnMouseOverEvent();
 	}
 
 
@@ -80,6 +170,32 @@ export class RenderObject implements RenderObjectConstructor {
 		this.y = y - (this.height / 2);
 
 		return this;
+	}
+
+	/** Sets the position of this object using a method. */
+	public SetPosition(x: number, y: number): RenderObject {
+
+		if (typeof this.x !== "number") throw new Error("Cannot set x-axis of object, as it does not exist or is not a number.");
+		if (typeof this.y !== "number") throw new Error("Cannot set y-axis of object, as it does not exist or is not a number.");
+
+		this.x = x;
+		this.y = y;
+
+		return this;
+	}
+
+	public SetFixedSize(width: number, height: number, position: Vector2) {
+
+		if (typeof this.x !== "number") throw new Error("Cannot set x-axis of object, as it does not exist or is not a number.");
+		if (typeof this.y !== "number") throw new Error("Cannot set y-axis of object, as it does not exist or is not a number.");
+		if (typeof this.width !== "number") throw new Error("Cannot set width of object, as it does not exist or is not a number.");
+		if (typeof this.height !== "number") throw new Error("Cannot set height of object, as it does not exist or is not a number.");
+
+		this.width = width;
+		this.height = height;
+
+		this.x = position.x - (this.width / 2);
+		this.y = position.y - (this.height / 2);
 	}
 
 	/**
@@ -356,7 +472,7 @@ export class RenderObject implements RenderObjectConstructor {
 	 */
 	public AnimateCurrentRotation(to: number, easing: EasingName, duration: number): RenderObject {
 
-		if (typeof this.rotation !== "number") throw new Error("Cannot animate x-axis of object as it does not exist or is not a number.");
+		if (typeof this.rotation !== "number") throw new Error("Cannot animate rotation of object as it does not exist or is not a number.");
 
 		const now: number = Date.now();
 		const startRotation = this.rotation;
@@ -365,7 +481,7 @@ export class RenderObject implements RenderObjectConstructor {
 
 			const elapsedTime = Date.now() - now;
 
-			const easingValue: number = Easings[easing](elapsedTime, 0, to - now, duration);
+			const easingValue: number = Easings[easing](elapsedTime, 0, to - startRotation, duration);
 
 			this.rotation = startRotation + easingValue;
 
@@ -377,7 +493,6 @@ export class RenderObject implements RenderObjectConstructor {
 		return this;
 	}
 
-
 	/**
 	 * Appends an event listener which will be evoked when any of these event gets triggered. 
 	 * 
@@ -385,12 +500,17 @@ export class RenderObject implements RenderObjectConstructor {
 	 * @param event
 	 * @param cb
 	 */
-	public AddEventListener(event: RenderObjectEvents, cb: () => void): RenderObject {
+	public AddEventListener(event: RenderObjectEvents, cb: (event: RenderObjectEventObject) => void): RenderObject {
 
 		if (typeof event !== "string") throw new Error("Cannot add event since event argument is not a string type.");
 		if (typeof cb !== "function") throw new Error("Cannot add event since callback argument is not a function type."); 
 
 		this.events[event] = cb;
+
+		if (event === "mouseUp" || event === "mouseClick") {
+
+			throw new Error(`Failed to set ${event} event listener on object id ${this.id}.`);
+		}
 
 		return this;
 	}
@@ -404,6 +524,7 @@ export class RenderObject implements RenderObjectConstructor {
 
 		if (typeof styles.direction === "string") ctx.direction = styles.direction;
 		if (typeof styles.backgroundColor === "string") ctx.fillStyle = styles.backgroundColor;
+		if (typeof styles.textColor === "string") ctx.fillStyle = styles.textColor;
 		if (typeof styles.filter === "string") ctx.filter = styles.filter;
 		if (typeof styles.font === "string") ctx.font = styles.font;
 		if (typeof styles.opacity === "number") ctx.globalAlpha = styles.opacity;
@@ -415,7 +536,11 @@ export class RenderObject implements RenderObjectConstructor {
 		if (typeof styles.lineJoin === "string") ctx.lineJoin = styles.lineJoin;
 		if (typeof styles.miterLimit === "number") ctx.miterLimit = styles.miterLimit;
 		if (typeof styles.borderWidth === "number") ctx.lineWidth = styles.borderWidth;
+		if (typeof styles.strokeWidth === "number") ctx.lineWidth = styles.strokeWidth;
+		if (typeof styles.lineWidth === "number") ctx.lineWidth = styles.lineWidth;
 		if (typeof styles.borderColor === "string") ctx.strokeStyle = styles.borderColor;
+		if (typeof styles.strokeColor === "string") ctx.strokeStyle = styles.strokeColor;
+		if (typeof styles.textStrokeColor === "string") ctx.strokeStyle = styles.textStrokeColor;
 		if (typeof styles.shadowBlur === "number") ctx.shadowBlur = styles.shadowBlur;
 		if (typeof styles.shadowColor === "string") ctx.shadowColor = styles.shadowColor;
 		if (typeof styles.shadowOffsetX === "number") ctx.shadowOffsetX = styles.shadowOffsetX;

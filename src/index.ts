@@ -9,6 +9,11 @@ export { Renderer } from "./classes/renderer";
 export { Camera } from "./classes/camera";
 export { Looper } from "./classes/looper";
 export { Rectangle } from "./classes/rectangle";
+export { TextNode } from "./classes/text";
+export { Circle } from "./classes/circle";
+export { Geometry2D } from "./classes/geometry-2d";
+export { Line2D, LineSystem2D } from "./classes/linesystem";
+export { SpritesheetController } from "./classes/spritesheet-controller";
 
 export { ColorCodes, RandomColor, ConvertHexToByteArray, ConvertByteArrayToHex } from "./constants/colors";
 
@@ -17,13 +22,13 @@ export { WaitFor, LoadImageSync } from "./functions/utilities";
 export { Easings } from "./functions/easings";
 
 
-export { RandomIntBeween, CalculateAngle, CalculateAtan, CalculateDistance, CalculateIntersection, GetAverageArrayValue, Vec2, Vec3 } from "./functions/math";
+export { RandomIntBetween, CalculateAngle, CalculateAtan, CalculateDistance, CalculateIntersection, GetAverageArrayValue, Vec2, Vec3, AnimateInterger } from "./functions/math";
 
 export {
 	SceneConstructor,
 	SceneMouseButtonsObject,
 	SceneMouseObject,
-	SceneEvents,
+ 	SceneEvents,
 	SceneAttributes,
 	SceneMouseWheelDirection,
 	SceneImageFormat,
@@ -55,5 +60,16 @@ export {
 	DragOffsetType,
 	RectangleDragConfiguration,
 	DragMouseButton,
-	EasingName
+	EasingName,
+	TextConstructor,
+	RenderObjectEvents,
+	CircleConstructor,
+	Geometry2DConstructor,
+	Geometry2DStyles,
+	LineSystem2DConstructor,
+	Line2DConstructor,
+	LineSystem2DOptions,
+	RenderObjectEventObject,
+	Dimension2D,
+	SpritesheetControllerConstructor
 } from "./typings";

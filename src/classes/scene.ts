@@ -1,4 +1,7 @@
-import { MouseDownObject, MouseEnterObject, MouseMoveObject, MouseOutObject, MouseUpObject, MouseWheelObject, SceneAttributes, SceneConstructor, SceneEvents, SceneImageFormat, SceneMouseObject } from "../typings";
+import { UniqueID } from "../functions/uid";
+import { CameraConstructor, MouseDownObject, MouseEnterObject, MouseMoveObject, MouseOutObject, MouseUpObject, MouseWheelObject, RendererConstructor, SceneAttributes, SceneConstructor, SceneEvents, SceneImageFormat, SceneMouseObject, Vector2 } from "../typings";
+import { Camera } from "./camera";
+import { Renderer } from "./renderer";
 
 function createMouseObject(): SceneMouseObject {
 	return {
@@ -8,7 +11,12 @@ function createMouseObject(): SceneMouseObject {
 		buttons: {
 			left: false,
 			middle: false,
-			right: false
+			right: false,
+			resetState: function () {
+				this.left = false;
+				this.middle = false;
+				this.right = false;
+			}
 		},
 		checkObjectEntry: function (x: number, y: number, range: number) {
 
@@ -35,10 +43,15 @@ export class Scene implements SceneConstructor {
 	public domElement;
 	public canvasElement;
 
+	public id: string = UniqueID(18).id;
+
 	public events: {[key: string]: Function} = {};
 
 	declare public attributes: SceneAttributes[];
 	declare public mouse: SceneMouseObject;
+
+	declare public camera: Camera | CameraConstructor;
+	declare public renderer: Renderer | RendererConstructor;
 
 	/**
 	 * Creates a scene in which graphical elements are rendered. This is a required component within the program.
@@ -65,7 +78,13 @@ export class Scene implements SceneConstructor {
 		canvas.className = "scene stinky2d-scene bruh";
 		canvas.width = width;
 		canvas.height = height;
+
 		canvas.setAttribute("crossOrigin", "anonymous");
+		canvas.setAttribute("scene-id", this.id);
+		canvas.setAttribute("scene-type", "2d");
+		canvas.setAttribute("enable-mouse-tracking", "true");
+		canvas.setAttribute("enable-keyboard-tracking", "true");
+
 		domElement.appendChild(canvas);
 
 
@@ -81,16 +100,16 @@ export class Scene implements SceneConstructor {
 
 			const now = performance.now(),
 				deltaTime = now - this.mouse.lastTimestamp,
-				distanceX = Math.abs(event.offsetX - this.mouse.x),
+				distanceX = Math.abs(event.clientX - this.mouse.x),
 				speedX = Math.round(distanceX / deltaTime * 1000),
-				distanceY = Math.abs(event.offsetY - this.mouse.y),
+				distanceY = Math.abs(event.clientY - this.mouse.y),
 				speedY = Math.round(distanceY / deltaTime * 1000);
 
 			this.mouse.velocityX = speedX;
 			this.mouse.velocityY = speedY;
 
-			this.mouse.x = event.offsetX;
-			this.mouse.y = event.offsetY;
+			this.mouse.x = event.clientX;
+			this.mouse.y = event.clientY;
 
 			this.mouse.lastTimestamp = now;
 
@@ -270,5 +289,18 @@ export class Scene implements SceneConstructor {
 		delete this.events[event];
 
 		return true;
+	}
+
+	public GetFixedMousePosition(): Vector2 {
+
+		if (!this.camera) return {
+			x: this.mouse.x,
+			y: this.mouse.y
+		}
+
+		return {
+			x: (this.mouse.x - this.camera.x) / this.camera.scaleX,
+			y: (this.mouse.y - this.camera.y) / this.camera.scaleY,
+		}
 	}
 }

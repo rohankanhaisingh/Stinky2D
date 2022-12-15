@@ -1,6 +1,7 @@
-import { EasingName, RenderObjectConstructor, RenderObjectEvents, RenderObjectStyleApplyingResults, RenderObjectStyles, Vector2 } from "../typings";
+import { Dimension2D, EasingName, RenderObjectConstructor, RenderObjectEventObject, RenderObjectEvents, RenderObjectStyleApplyingResults, RenderObjectStyles, SpritesheetControllerConstructor, Vector2 } from "../typings";
 import { Renderer } from "./renderer";
 import { Scene } from "./scene";
+import { SpritesheetController } from "./spritesheet-controller";
 export declare const AllExistingRenderObjects: RenderObject[];
 export declare class RenderObject implements RenderObjectConstructor {
     id: string;
@@ -9,24 +10,39 @@ export declare class RenderObject implements RenderObjectConstructor {
     visible: boolean;
     forceRendering: boolean;
     events: {
-        [key: string]: Function;
+        [key: string]: (event: RenderObjectEventObject) => void;
     };
     eventsOnce: {
         [key: string]: Function;
+    };
+    eventStates: {
+        hasEntered: boolean;
+        hasLeft: boolean;
+        hasClicked: boolean;
+        isDown: boolean;
+        isUp: boolean;
     };
     x: number;
     y: number;
     width: number;
     height: number;
     radius: number;
-    segments: number[];
+    segments: Vector2[];
     styles: RenderObjectStyles;
     rotation: number;
+    velocityX: number;
+    velocityY: number;
+    gravitationalAcceleration: number;
+    objectWeight: number;
     scene: Scene;
     renderer: Renderer;
+    initialPosition: Vector2;
+    initialDimension: Dimension2D;
+    spritesheetController?: SpritesheetController | SpritesheetControllerConstructor;
     constructor();
     Draw(ctx: CanvasRenderingContext2D): number;
     Update(ctx: CanvasRenderingContext2D, deltaTime: number): number;
+    private _updateOnMouseOverEvent;
     UpdateEvents(): this | undefined;
     /**
      * Centers the render object based on the object's dimensions and position.
@@ -34,6 +50,9 @@ export declare class RenderObject implements RenderObjectConstructor {
      * @param y y-axis.
      */
     Center(x: number, y: number): RenderObject;
+    /** Sets the position of this object using a method. */
+    SetPosition(x: number, y: number): RenderObject;
+    SetFixedSize(width: number, height: number, position: Vector2): void;
     /**
      * Changes the size using a method
      * @param width Width of this component.
@@ -104,7 +123,7 @@ export declare class RenderObject implements RenderObjectConstructor {
      * @param event
      * @param cb
      */
-    AddEventListener(event: RenderObjectEvents, cb: () => void): RenderObject;
+    AddEventListener(event: RenderObjectEvents, cb: (event: RenderObjectEventObject) => void): RenderObject;
     /** Fuckinf fucky fuck fuck fuck */
     static ApplyRenderStyles(ctx: CanvasRenderingContext2D, styles: RenderObjectStyles): RenderObjectStyleApplyingResults;
     /**

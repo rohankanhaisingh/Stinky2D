@@ -1,10 +1,10 @@
-import { AtanCalculation, Vector2, Vector3 } from "../typings";
+import { AtanCalculation, EasingName, Vector2, Vector3 } from "../typings";
 /**
  * Generates a random number between two numbers.
  * @param number1 Minimum rage number
  * @param number2 Maximum rage number
 */
-export declare function RandomIntBeween(number1: number, number2: number): number;
+export declare function RandomIntBetween(number1: number, number2: number): number;
 /**
  * Calculates the average value of an array, returning a float number.
  *
@@ -33,7 +33,26 @@ export declare function CalculateAngle(cx: number, cy: number, ex: number, ey: n
  * */
 export declare function CalculateIntersection(p1: Vector2, p2: Vector2, p3: Vector2, p4: Vector2): Vector2;
 /**Creates a empty Vector2 object. */
-export declare function Vec2(x?: number, y?: number): Vector2;
+export declare class Vec2 implements Vector2 {
+    x: number;
+    y: number;
+    constructor(x?: number, y?: number);
+    Set(x: number | null, y: number | null): this;
+    Clone(): Vec2;
+    Multiply(value: Vector2 | Vec2): this;
+    MultiplyScalar(scalar: number): this;
+    Devide(value: Vector2 | Vec2): this;
+    Min(value: Vector2 | Vec2): this;
+    Max(value: Vector2 | Vec2): this;
+    Clamp(min: Vector2 | Vec2, max: Vector2 | Vec2): this;
+    ClampScalar(min: number, max: number): this;
+    Floor(): this;
+    Ceil(): this;
+    Round(): this;
+    Dot(value: Vector2 | Vec2): number;
+    ComputeAngle(): number;
+    RotateAround(center: Vector2 | Vec2, angle: number): this;
+}
 export declare function Vec3(): Vector3;
 /**
  * Uses the atan method to calculate the direction between two coordinates, returning an object with the base value and another method and properties.
@@ -44,3 +63,4 @@ export declare function Vec3(): Vector3;
  * @param y2 y-axis of second coordinate.
  */
 export declare function CalculateAtan(x1: number, y1: number, x2: number, y2: number): AtanCalculation;
+export declare function AnimateInterger(from: number, to: number, easing: EasingName, duration: number, resultCallback: (value: number) => void): void;

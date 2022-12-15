@@ -1,15 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CalculateAtan = exports.Vec3 = exports.Vec2 = exports.CalculateIntersection = exports.CalculateAngle = exports.CalculateDistance = exports.GetAverageArrayValue = exports.RandomIntBeween = void 0;
+exports.AnimateInterger = exports.CalculateAtan = exports.Vec3 = exports.Vec2 = exports.CalculateIntersection = exports.CalculateAngle = exports.CalculateDistance = exports.GetAverageArrayValue = exports.RandomIntBetween = void 0;
+const easings_1 = require("./easings");
 /**
  * Generates a random number between two numbers.
  * @param number1 Minimum rage number
  * @param number2 Maximum rage number
 */
-function RandomIntBeween(number1, number2) {
+function RandomIntBetween(number1, number2) {
     return Math.floor(Math.random() * (number2 - number1 + 1) + number1);
 }
-exports.RandomIntBeween = RandomIntBeween;
+exports.RandomIntBetween = RandomIntBetween;
 /**
  * Calculates the average value of an array, returning a float number.
  *
@@ -34,9 +35,7 @@ exports.GetAverageArrayValue = GetAverageArrayValue;
  * @param y2
 */
 function CalculateDistance(x1, y1, x2, y2) {
-    let d1 = x1 - x2, d2 = y1 - y2, 
-    //@ts-expect-error
-    distance = Math.sqrt(d1 * d1, d2 * d2);
+    let d1 = x2 - x1, d2 = y2 - y1, distance = Math.sqrt(d1 * d1 + d2 * d2);
     return distance;
 }
 exports.CalculateDistance = CalculateDistance;
@@ -77,8 +76,84 @@ function CalculateIntersection(p1, p2, p3, p4) {
 }
 exports.CalculateIntersection = CalculateIntersection;
 /**Creates a empty Vector2 object. */
-function Vec2(x, y) {
-    return { x: typeof x === "number" ? x : 0, y: typeof y === "number" ? y : 0 };
+class Vec2 {
+    constructor(x, y) {
+        this.x = typeof x === "number" ? x : 0;
+        this.y = typeof y === "number" ? y : 0;
+    }
+    Set(x, y) {
+        this.x = typeof x === "number" ? x : this.x;
+        this.y = typeof y === "number" ? y : this.y;
+        return this;
+    }
+    Clone() {
+        return new Vec2(this.x, this.y);
+    }
+    Multiply(value) {
+        this.x *= value.x;
+        this.y *= value.y;
+        return this;
+    }
+    MultiplyScalar(scalar) {
+        this.x *= scalar;
+        this.y *= scalar;
+        return this;
+    }
+    Devide(value) {
+        this.x /= value.x;
+        this.y /= value.y;
+        return this;
+    }
+    Min(value) {
+        this.x = Math.min(this.x, value.x);
+        this.y = Math.min(this.y, value.y);
+        return this;
+    }
+    Max(value) {
+        this.x = Math.max(this.x, value.x);
+        this.y = Math.max(this.y, value.y);
+        return this;
+    }
+    Clamp(min, max) {
+        this.x = Math.max(min.x, Math.min(max.x, this.x));
+        this.y = Math.max(min.y, Math.min(max.y, this.y));
+        return this;
+    }
+    ClampScalar(min, max) {
+        this.x = Math.max(min, Math.min(max, this.x));
+        this.y = Math.max(min, Math.min(max, this.y));
+        return this;
+    }
+    Floor() {
+        this.x = Math.floor(this.x);
+        this.y = Math.floor(this.y);
+        return this;
+    }
+    Ceil() {
+        this.x = Math.ceil(this.x);
+        this.y = Math.ceil(this.y);
+        return this;
+    }
+    Round() {
+        this.x = Math.round(this.x);
+        this.y = Math.round(this.y);
+        return this;
+    }
+    Dot(value) {
+        return this.x * value.x + this.y * value.y;
+    }
+    ComputeAngle() {
+        const angle = Math.atan2(-this.y, -this.x) + Math.PI;
+        return angle;
+    }
+    RotateAround(center, angle) {
+        const c = Math.cos(angle), s = Math.sin(angle);
+        const x = this.x - center.x;
+        const y = this.y - center.y;
+        this.x = x * c - y * s + center.x;
+        this.y = x * s + y * c + center.y;
+        return this;
+    }
 }
 exports.Vec2 = Vec2;
 function Vec3() {
@@ -121,3 +196,27 @@ function CalculateAtan(x1, y1, x2, y2) {
     };
 }
 exports.CalculateAtan = CalculateAtan;
+function AnimateInterger(from, to, easing, duration, resultCallback) {
+    if (typeof from !== "number")
+        throw new Error("Cannot animate integer because starting value is not defined.");
+    if (typeof to !== "number")
+        throw new Error("Cannot animate integer because ending value is not defined.");
+    if (typeof duration !== "number")
+        throw new Error("Cannot animate integer because duration value is not defined.");
+    if (typeof resultCallback !== "function")
+        throw new Error("Cannot animate integer because callback function is not defined.");
+    const now = Date.now();
+    const updateTick = () => {
+        const elapsedTime = Date.now() - now;
+        const easingValue = easings_1.Easings[easing](elapsedTime, 0, to - from, duration);
+        resultCallback(from + easingValue);
+        if (elapsedTime < duration) {
+            window.requestAnimationFrame(updateTick);
+        }
+        else {
+            resultCallback(to);
+        }
+    };
+    updateTick();
+}
+exports.AnimateInterger = AnimateInterger;

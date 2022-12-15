@@ -4,13 +4,14 @@ import { UniqueID } from "../functions/uid";
 import { Camera } from "./camera";
 import { RenderObject } from "./renderobject";
 import { setUncaughtExceptionCaptureCallback } from "process";
+import { SpritesheetController } from "./spritesheet-controller";
 
 export class Renderer implements RendererConstructor {
 
 	public id = UniqueID(18).id;
 	public timestamp = Date.now();
 	public renderObjects: RenderObject[] = [];
-	public visibleRenderObjects = [];
+	public visibleRenderObjects: RenderObject[] = [];
 
 	public attributes = {};
 
@@ -101,13 +102,12 @@ export class Renderer implements RendererConstructor {
 		while (i < this.renderObjects.length) {
 
 			const obj: RenderObject = this.renderObjects[i];
-
 			if (!this.camera.offScreenRendering) {
 
 				if (typeof obj.width === "number" && typeof obj.height === "number") {
 
 					if (!obj.forceRendering) {
-						if (obj.x > -(((this.camera.x + 30) / this.camera.scaleX) + obj.width) && obj.x < -((this.camera.x - this.camera.width) / this.camera.scaleX) &&
+						if (obj.x > -(((this.camera.x + 30) / this.camera.scaleX) + (obj.width)) && obj.x < -((this.camera.x - this.camera.width) / this.camera.scaleX) &&
 							obj.y > -((this.camera.y + 30) / this.camera.scaleY) && obj.y < -((this.camera.y - (this.camera.height))) / this.camera.scaleY) {
 
 							visibleObjects.push(obj);
@@ -117,6 +117,8 @@ export class Renderer implements RendererConstructor {
 							if (typeof obj.Draw === "function") obj.Draw(this.context);
 							if (typeof obj.Update === "function") obj.Update(this.context, deltaTime);
 
+							if (obj.spritesheetController as SpritesheetController) (obj.spritesheetController as SpritesheetController).Update(deltaTime);
+
 						} else {
 							obj.visible = false;
 						}
@@ -124,6 +126,37 @@ export class Renderer implements RendererConstructor {
 
 						if (typeof obj.Draw === "function") obj.Draw(this.context);
 						if (typeof obj.Update === "function") obj.Update(this.context, deltaTime);
+						if (obj.spritesheetController as SpritesheetController) (obj.spritesheetController as SpritesheetController).Update(deltaTime);
+
+						visibleObjects.push(obj);
+
+						obj.visible = false;
+					}
+
+				}
+
+				if (typeof obj.radius === "number") {
+
+					if (!obj.forceRendering) {
+						if (obj.x > -(((this.camera.x + 30) / this.camera.scaleX) + (obj.radius)) && obj.x < -((this.camera.x - this.camera.width) / this.camera.scaleX) &&
+							obj.y > -((this.camera.y + 30) / this.camera.scaleY) && obj.y < -((this.camera.y - (this.camera.height))) / this.camera.scaleY) {
+
+							visibleObjects.push(obj);
+
+							obj.visible = true;
+
+							if (typeof obj.Draw === "function") obj.Draw(this.context);
+							if (typeof obj.Update === "function") obj.Update(this.context, deltaTime);
+							if (obj.spritesheetController as SpritesheetController) (obj.spritesheetController as SpritesheetController).Update(deltaTime);
+
+						} else {
+							obj.visible = false;
+						}
+					} else {
+
+						if (typeof obj.Draw === "function") obj.Draw(this.context);
+						if (typeof obj.Update === "function") obj.Update(this.context, deltaTime);
+						if (obj.spritesheetController as SpritesheetController) (obj.spritesheetController as SpritesheetController).Update(deltaTime);
 
 						visibleObjects.push(obj);
 
@@ -136,11 +169,13 @@ export class Renderer implements RendererConstructor {
 
 				if (typeof obj.Draw === "function") obj.Draw(this.context);
 				if (typeof obj.Update === "function") obj.Update(this.context, deltaTime);
-
+				if (obj.spritesheetController as SpritesheetController) (obj.spritesheetController as SpritesheetController).Update(deltaTime);
 			}
 
 			i += 1;
 		}
+
+		this.visibleRenderObjects = visibleObjects;
 
 		ctx.restore();
 
@@ -158,7 +193,7 @@ export class Renderer implements RendererConstructor {
 	 * An error might be thrown if an instance already has been added to this renderer.
 	 * @param renderObject 
 	*/
-	public Add(renderObject: RenderObject): Renderer {
+	public Add(renderObject: RenderObject): RenderObject {
 
 		let hasFoundObject: boolean = false;
 
@@ -176,7 +211,7 @@ export class Renderer implements RendererConstructor {
 
 		this.renderObjects.push(renderObject);
 
-		return this;
+		return renderObject;
 	}
 
 	public Destroy(renderObject: RenderObject): Renderer {

@@ -34,6 +34,7 @@ export class Camera implements CameraConstructor {
 		this.ctx = renderer.context;
 
 		renderer.camera = this;
+		scene.camera = this;
 	}
 
 	/**
