@@ -142,10 +142,7 @@ async function createLightningLoop() {
 	createLightningLoop();
 }
 
-async function main<T, BruhSauce>() {
-
-	textures.smoke = await LoadImageSync("../res/textures/smoke.png");
-	textures.orb = await LoadImageSync("../res/textures/glow_orb.png");
+async function main() {
 
 	createLightningLoop();
 	createRainFall(350);

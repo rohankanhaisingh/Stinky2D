@@ -1,3 +1,4 @@
+import { AudioNode2D } from "./classes/audio-system-2d";
 import { RenderObject } from "./classes/renderobject";
 
 export type UniqueIDFilterKeywords = "numbers" | "letters" | "lettersUpperCase" | "lettersLowerCase";
@@ -11,7 +12,7 @@ export type SceneEvents = "sceneResize" | "mouseDown" | "mouseUp" | "mouseMove" 
 export type SceneImageFormat = "png" | "webp" | "jpeg" | "jpg";
 export type LooperOnUpdateEvent = (state: LooperTickState) => void;
 export type LooperEventNames = "update";
-
+export type AudioNode2DEvents = "end" | "play" | "playing" | "pause" | "update" | "load";
 
 /*
  * Interface representing an object that will be returned
@@ -344,4 +345,34 @@ export interface SpritesheetControllerEventObject {
 	update?: (timestamp: number) => void;
 	detach?: (timestamp: number) => void;
 	attach?: (timestamp: number) => void;
+}
+
+export interface AudioSystem2DConstructor {
+	maxAudioNodes: number;
+	ctx: AudioContext;
+	gain: GainNode;
+	panner: StereoPannerNode;
+	id: string;
+	nodes: AudioSystem2DConstructor[] | AudioNode2D[];
+}
+
+export interface AudioNode2DConstructor {
+	ctx: AudioContext;
+	id: string;
+	timestamp: number;
+	x: number;
+	y: number;
+	range: number;
+	events: {[event in AudioNode2DEvents]?: () => void};
+}
+
+export interface SimplifiedImageData {
+	readonly red: number;
+	readonly green: number;
+	readonly blue: number;
+	readonly alpha: number;
+	readonly colorSpace: PredefinedColorSpace;
+	readonly width: number;
+	readonly height: number;
+	readonly hex: string;
 }

@@ -110,8 +110,6 @@ function createLightningLoop() {
 }
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
-        textures.smoke = yield (0, index_1.LoadImageSync)("../res/textures/smoke.png");
-        textures.orb = yield (0, index_1.LoadImageSync)("../res/textures/glow_orb.png");
         createLightningLoop();
         createRainFall(350);
         scene.AddEventListener("mouseDown", function () {

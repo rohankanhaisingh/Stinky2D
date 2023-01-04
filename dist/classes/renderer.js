@@ -17,10 +17,14 @@ class Renderer {
         this.visibleRenderObjects = [];
         this.attributes = {};
         this.transform = null;
+        this.picking = false;
+        this.pickDelay = 100;
+        this.lastPicked = Date.now();
         this.scene = scene;
         this.attributes = Object.assign({}, attributes);
-        this.context = scene.canvasElement.getContext("2d");
+        this.context = scene.canvasElement.getContext("2d", attributes);
         scene.renderer = this;
+        window.Stinky2D[this.id] = this;
     }
     /**Clears the entire scene, which will end up showing a black scene. */
     ClearScene() {
@@ -139,6 +143,12 @@ class Renderer {
             i += 1;
         }
         this.visibleRenderObjects = visibleObjects;
+        if (this.picking) {
+            const now = Date.now();
+            if (now > this.lastPicked + this.pickDelay) {
+                this.lastPicked = now;
+            }
+        }
         ctx.restore();
         results.renderedAmountOfObjects = visibleObjects.length;
         results.endedAt = Date.now();
@@ -150,7 +160,7 @@ class Renderer {
      *
      * An error might be thrown if an instance already has been added to this renderer.
      * @param renderObject
-    */
+    //*/
     Add(renderObject) {
         let hasFoundObject = false;
         for (let i = 0; i < this.renderObjects.length; i++) {
@@ -164,6 +174,39 @@ class Renderer {
         renderObject.renderer = this;
         this.renderObjects.push(renderObject);
         return renderObject;
+    }
+    /**Enables the ability to analyze the colors in the rendered image */
+    EnablePicking() {
+        this.lastPicked = Date.now();
+        return this.picking = true;
+    }
+    /**Disables the ability to analyze the colors in the rendered image */
+    DisablePicking() {
+        this.lastPicked = Date.now();
+        return this.picking = false;
+    }
+    /**
+     *  Sets a delay in which the rendered image is analyzed
+     *	The default value is 100.
+     *
+     *	Does not accept float numbers.
+     *
+     * @param delay Delay in milliseconds.
+     */
+    SetPickDelay(delay) {
+        return this.pickDelay = delay;
+    }
+    /**
+     *
+     * This method returns an ImageData object representing the underlying pixel data for a specified portion of the canvas
+     * using the CanvasRenderingContext2D.getImageData method.
+     *
+     * If the rendered image is analyzed multiple times, make sure the 'willReadFrequently' option is enabled when building a 'Renderer' class.
+     * The greater the value of the desired width and height of the analysis, the more time it will take to perform the analysis.
+     * WebGL can be used to make the analysis faster, through the graphics card.
+     * */
+    GetImageData(startX, startY, width, height) {
+        return this.context.getImageData(startX, startY, width, height, { colorSpace: "display-p3" });
     }
     Destroy(renderObject) {
         for (let i = 0; i < this.renderObjects.length; i++) {

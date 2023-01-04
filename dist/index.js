@@ -4,7 +4,9 @@
  *
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AnimateInterger = exports.Vec3 = exports.Vec2 = exports.GetAverageArrayValue = exports.CalculateIntersection = exports.CalculateDistance = exports.CalculateAtan = exports.CalculateAngle = exports.RandomIntBetween = exports.Easings = exports.LoadImageSync = exports.WaitFor = exports.UniqueID = exports.ConvertByteArrayToHex = exports.ConvertHexToByteArray = exports.RandomColor = exports.ColorCodes = exports.SpritesheetController = exports.LineSystem2D = exports.Line2D = exports.Geometry2D = exports.Circle = exports.TextNode = exports.Rectangle = exports.Looper = exports.Camera = exports.Renderer = exports.AllExistingRenderObjects = exports.RenderObject = exports.Scene = void 0;
+exports.AnimateInterger = exports.Vec3 = exports.Vec2 = exports.GetAverageArrayValue = exports.CalculateIntersection = exports.CalculateDistance = exports.CalculateAtan = exports.CalculateAngle = exports.RandomIntBetween = exports.Easings = exports.SimplifyImageData = exports.LoadImageSync = exports.WaitFor = exports.UniqueID = exports.ConvertByteArrayToHex = exports.ConvertHexToByteArray = exports.RandomColor = exports.ColorCodes = exports.AudioNode2D = exports.AudioSystem2D = exports.SpritesheetController = exports.LineSystem2D = exports.Line2D = exports.Geometry2D = exports.Circle = exports.TextNode = exports.Rectangle = exports.Looper = exports.Camera = exports.Renderer = exports.AllExistingRenderObjects = exports.RenderObject = exports.Scene = void 0;
+window.Stinky2D = {};
+window.RenderingOptions = {};
 var scene_1 = require("./classes/scene");
 Object.defineProperty(exports, "Scene", { enumerable: true, get: function () { return scene_1.Scene; } });
 var renderobject_1 = require("./classes/renderobject");
@@ -29,6 +31,9 @@ Object.defineProperty(exports, "Line2D", { enumerable: true, get: function () { 
 Object.defineProperty(exports, "LineSystem2D", { enumerable: true, get: function () { return linesystem_1.LineSystem2D; } });
 var spritesheet_controller_1 = require("./classes/spritesheet-controller");
 Object.defineProperty(exports, "SpritesheetController", { enumerable: true, get: function () { return spritesheet_controller_1.SpritesheetController; } });
+var audio_system_2d_1 = require("./classes/audio-system-2d");
+Object.defineProperty(exports, "AudioSystem2D", { enumerable: true, get: function () { return audio_system_2d_1.AudioSystem2D; } });
+Object.defineProperty(exports, "AudioNode2D", { enumerable: true, get: function () { return audio_system_2d_1.AudioNode2D; } });
 var colors_1 = require("./constants/colors");
 Object.defineProperty(exports, "ColorCodes", { enumerable: true, get: function () { return colors_1.ColorCodes; } });
 Object.defineProperty(exports, "RandomColor", { enumerable: true, get: function () { return colors_1.RandomColor; } });
@@ -39,6 +44,7 @@ Object.defineProperty(exports, "UniqueID", { enumerable: true, get: function () 
 var utilities_1 = require("./functions/utilities");
 Object.defineProperty(exports, "WaitFor", { enumerable: true, get: function () { return utilities_1.WaitFor; } });
 Object.defineProperty(exports, "LoadImageSync", { enumerable: true, get: function () { return utilities_1.LoadImageSync; } });
+Object.defineProperty(exports, "SimplifyImageData", { enumerable: true, get: function () { return utilities_1.SimplifyImageData; } });
 var easings_1 = require("./functions/easings");
 Object.defineProperty(exports, "Easings", { enumerable: true, get: function () { return easings_1.Easings; } });
 var math_1 = require("./functions/math");

@@ -3,7 +3,6 @@ import { Scene } from "./scene";
 import { UniqueID } from "../functions/uid";
 import { Camera } from "./camera";
 import { RenderObject } from "./renderobject";
-import { setUncaughtExceptionCaptureCallback } from "process";
 import { SpritesheetController } from "./spritesheet-controller";
 
 export class Renderer implements RendererConstructor {
@@ -16,6 +15,11 @@ export class Renderer implements RendererConstructor {
 	public attributes = {};
 
 	public transform: TransformMatrices | null = null;
+
+	public picking: boolean = false;
+	public pickDelay: number = 100;
+	public lastPicked: number = Date.now();
+
 	declare public scene: Scene | SceneConstructor;
 	declare public context: CanvasRenderingContext2D;
 	declare public camera: Camera | CameraConstructor | undefined;
@@ -30,9 +34,11 @@ export class Renderer implements RendererConstructor {
 
 		this.scene = scene;
 		this.attributes = { ...attributes };
-		this.context = scene.canvasElement.getContext("2d") as CanvasRenderingContext2D;
+		this.context = scene.canvasElement.getContext("2d", attributes) as CanvasRenderingContext2D;
 
 		(scene as SceneConstructor).renderer = this;
+
+		window.Stinky2D[this.id] = this;
 	}
 
 	/**Clears the entire scene, which will end up showing a black scene. */
@@ -177,6 +183,18 @@ export class Renderer implements RendererConstructor {
 
 		this.visibleRenderObjects = visibleObjects;
 
+		if (this.picking) {
+
+			const now = Date.now();
+
+			if (now > this.lastPicked + this.pickDelay) {
+
+				
+				this.lastPicked = now;
+			}
+
+		}
+
 		ctx.restore();
 
 		results.renderedAmountOfObjects = visibleObjects.length;
@@ -192,7 +210,7 @@ export class Renderer implements RendererConstructor {
 	 * 
 	 * An error might be thrown if an instance already has been added to this renderer.
 	 * @param renderObject 
-	*/
+	//*/
 	public Add(renderObject: RenderObject): RenderObject {
 
 		let hasFoundObject: boolean = false;
@@ -212,6 +230,43 @@ export class Renderer implements RendererConstructor {
 		this.renderObjects.push(renderObject);
 
 		return renderObject;
+	}
+
+	/**Enables the ability to analyze the colors in the rendered image */
+	public EnablePicking(): boolean {
+		this.lastPicked = Date.now();
+		return this.picking = true;
+	}
+
+	/**Disables the ability to analyze the colors in the rendered image */
+	public DisablePicking(): boolean {
+		this.lastPicked = Date.now();
+		return this.picking = false;
+	} 
+
+	/** 
+	 *  Sets a delay in which the rendered image is analyzed
+	 *	The default value is 100.
+	 *	
+	 *	Does not accept float numbers.
+	 * 
+	 * @param delay Delay in milliseconds.
+	 */
+	public SetPickDelay(delay: number): number {
+		return this.pickDelay = delay;
+	}
+
+	/**
+	 * 
+	 * This method returns an ImageData object representing the underlying pixel data for a specified portion of the canvas
+	 * using the CanvasRenderingContext2D.getImageData method.
+	 * 
+	 * If the rendered image is analyzed multiple times, make sure the 'willReadFrequently' option is enabled when building a 'Renderer' class.
+	 * The greater the value of the desired width and height of the analysis, the more time it will take to perform the analysis.
+	 * WebGL can be used to make the analysis faster, through the graphics card.
+	 * */
+	public GetImageData(startX: number, startY: number, width: number, height: number): ImageData {
+		return this.context.getImageData(startX, startY, width, height, { colorSpace: "display-p3" });
 	}
 
 	public Destroy(renderObject: RenderObject): Renderer {

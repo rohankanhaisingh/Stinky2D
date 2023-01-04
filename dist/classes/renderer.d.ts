@@ -9,6 +9,9 @@ export declare class Renderer implements RendererConstructor {
     visibleRenderObjects: RenderObject[];
     attributes: {};
     transform: TransformMatrices | null;
+    picking: boolean;
+    pickDelay: number;
+    lastPicked: number;
     scene: Scene | SceneConstructor;
     context: CanvasRenderingContext2D;
     camera: Camera | CameraConstructor | undefined;
@@ -37,7 +40,30 @@ export declare class Renderer implements RendererConstructor {
      *
      * An error might be thrown if an instance already has been added to this renderer.
      * @param renderObject
-    */
+    //*/
     Add(renderObject: RenderObject): RenderObject;
+    /**Enables the ability to analyze the colors in the rendered image */
+    EnablePicking(): boolean;
+    /**Disables the ability to analyze the colors in the rendered image */
+    DisablePicking(): boolean;
+    /**
+     *  Sets a delay in which the rendered image is analyzed
+     *	The default value is 100.
+     *
+     *	Does not accept float numbers.
+     *
+     * @param delay Delay in milliseconds.
+     */
+    SetPickDelay(delay: number): number;
+    /**
+     *
+     * This method returns an ImageData object representing the underlying pixel data for a specified portion of the canvas
+     * using the CanvasRenderingContext2D.getImageData method.
+     *
+     * If the rendered image is analyzed multiple times, make sure the 'willReadFrequently' option is enabled when building a 'Renderer' class.
+     * The greater the value of the desired width and height of the analysis, the more time it will take to perform the analysis.
+     * WebGL can be used to make the analysis faster, through the graphics card.
+     * */
+    GetImageData(startX: number, startY: number, width: number, height: number): ImageData;
     Destroy(renderObject: RenderObject): Renderer;
 }
