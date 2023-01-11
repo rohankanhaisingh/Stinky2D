@@ -2,7 +2,7 @@
  * 2D raining scene.
  */
 
-import { Camera, ColorCodes, Looper, LooperTickState, MouseMoveObject, Renderer, Scene, Vec2, LineSystem2D, RenderObjectStyles, Line2D, RandomIntBetween, AnimateInterger, MouseDownObject, Vector2, WaitFor, RandomColor, Rectangle, Circle, LoadImageSync } from "../index";
+import { Camera, ColorCodes, Looper, LooperTickState, MouseMoveObject, Renderer, Scene, Vec2, LineSystem2D, RenderObjectStyles, Line2D, RandomIntBetween, AnimateInteger, MouseDownObject, Vector2, WaitFor, RandomColor, Rectangle, Circle, LoadImageSync } from "../index";
 
 const scene = new Scene(innerWidth, innerHeight, document.querySelector(".app .container") as HTMLDivElement);
 const renderer = new Renderer(scene);
@@ -82,7 +82,7 @@ async function createLightning(x: number) {
 		await WaitFor(1);
 	}
 
-	AnimateInterger(lineWidth, 0, "easeOutExpo", duration, width => lineSystem.SetStyleOnLines("lineWidth", width));
+	AnimateInteger(lineWidth, 0, "easeOutExpo", duration, width => lineSystem.SetStyleOnLines("lineWidth", width));
 
 	setTimeout(function () {
 

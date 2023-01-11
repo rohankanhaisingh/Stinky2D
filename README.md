@@ -2,7 +2,9 @@
 
 A 2D graphics library made for Electron applications 
 
-_Last edited by Rohan Kanhaisingh at 1-12-2022._
+_Last edited by Rohan Kanhaisingh at 11-1-2023._
+
+Version 1.0.1
 
 - - -
 
@@ -33,7 +35,7 @@ const renderer = new Renderer(scene);
 const camera = new Camera(renderer, scene);
 const looper = new Looper();
 
-looper.addEventListener("update", function(state: LooperTickState): void {
+looper.AddEventListener("update", function(state: LooperTickState): void {
 	renderer.ClearScene();
 	renderer.PaintScene(ColorCodes.BLACK);
 

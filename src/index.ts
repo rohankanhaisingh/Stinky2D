@@ -2,18 +2,6 @@
  * Stinky2D library
  * 
  */
-
-declare global {
-	interface Window {
-		Stinky2D: any;
-		RenderingOptions: any;
-		EngineFlags: any;
-	}
-}
-
-window.Stinky2D = {};
-window.RenderingOptions = {};
-
 export { Scene } from "./classes/scene";
 export { RenderObject, AllExistingRenderObjects } from "./classes/renderobject";
 export { Renderer } from "./classes/renderer";
@@ -26,15 +14,28 @@ export { Geometry2D } from "./classes/geometry-2d";
 export { Line2D, LineSystem2D } from "./classes/linesystem";
 export { SpritesheetController } from "./classes/spritesheet-controller";
 export { AudioSystem2D, AudioNode2D } from "./classes/audio-system-2d";
-
 export { ColorCodes, RandomColor, ConvertHexToByteArray, ConvertByteArrayToHex } from "./constants/colors";
-
 export { UniqueID } from "./functions/uid"
-export { WaitFor, LoadImageSync, SimplifyImageData} from "./functions/utilities";
 export { Easings } from "./functions/easings";
 
+export {
+	WaitFor,
+	LoadImageSync,
+	SimplifyImageData,
+	LoadAudioSync
+} from "./functions/utilities";
 
-export { RandomIntBetween, CalculateAngle, CalculateAtan, CalculateDistance, CalculateIntersection, GetAverageArrayValue, Vec2, Vec3, AnimateInterger } from "./functions/math";
+export {
+	RandomIntBetween,
+	CalculateAngle,
+	CalculateAtan,
+	CalculateDistance,
+	CalculateIntersection,
+	GetAverageArrayValue,
+	Vec2,
+	Vec3,
+	AnimateInteger
+} from "./functions/math";
 
 export {
 	SceneConstructor,
@@ -88,5 +89,10 @@ export {
 	SpritesheetControllerEventObject,
 	AudioNode2DConstructor,
 	AudioNode2DEvents,
-	SimplifiedImageData
+	SimplifiedImageData,
+	AudioNode2DControllerNodeName,
+	AudioNode2DControllerNodes,
+	AudioNode2DAnalyserFFTSize
 } from "./typings";
+
+import "./constants/global";

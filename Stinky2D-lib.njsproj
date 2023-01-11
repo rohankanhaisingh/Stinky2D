@@ -70,6 +70,7 @@
     <Folder Include="src\test\" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="src\classes\audio-system-2d.ts" />
     <TypeScriptCompile Include="src\classes\camera.ts" />
     <TypeScriptCompile Include="src\classes\circle.ts" />
     <TypeScriptCompile Include="src\classes\geometry-2d.ts" />
@@ -87,6 +88,8 @@
     <TypeScriptCompile Include="src\functions\uid.ts" />
     <TypeScriptCompile Include="src\functions\utilities.ts" />
     <TypeScriptCompile Include="src\index.ts" />
+    <TypeScriptCompile Include="src\test\audio-test.ts" />
+    <TypeScriptCompile Include="src\test\color_picker.ts" />
     <TypeScriptCompile Include="src\test\events.ts" />
     <TypeScriptCompile Include="src\test\impossible_quiz.ts" />
     <TypeScriptCompile Include="src\test\ping_pong.ts" />

@@ -271,7 +271,7 @@ export function CalculateAtan(x1: number, y1: number, x2: number, y2: number): A
 
 }
 
-export function AnimateInterger(from: number, to: number, easing: EasingName, duration: number, resultCallback: (value: number) => void) {
+export function AnimateInteger(from: number, to: number, easing: EasingName, duration: number, resultCallback: (value: number) => void) {
 
     if (typeof from !== "number") throw new Error("Cannot animate integer because starting value is not defined.");
     if (typeof to !== "number") throw new Error("Cannot animate integer because ending value is not defined.");

@@ -1,4 +1,4 @@
-import { Scene, Renderer, Camera, Looper, SpritesheetController, Rectangle, LooperTickState, ColorCodes, LoadImageSync, RenderObjectEventObject, RandomIntBetween, AnimateInterger } from "../index";
+import { Scene, Renderer, Camera, Looper, SpritesheetController, Rectangle, LooperTickState, ColorCodes, LoadImageSync, RenderObjectEventObject, RandomIntBetween, AnimateInteger } from "../index";
 
 const scene = new Scene(innerWidth, innerHeight, document.querySelector(".app .container") as HTMLDivElement);
 const renderer = new Renderer(scene);
@@ -57,7 +57,7 @@ function createQuestionButton(x: number, y: number, textures: HTMLImageElement[]
 
 	rect.AddEventListener("mouseDown", function (event: RenderObjectEventObject) {
 
-		AnimateInterger(0, 360, "easeOutElastic", 3000, rotation => event.target.rotation = rotation);
+		AnimateInteger(0, 360, "easeOutElastic", 3000, rotation => event.target.rotation = rotation);
 	});
 
 

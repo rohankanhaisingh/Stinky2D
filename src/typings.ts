@@ -13,6 +13,9 @@ export type SceneImageFormat = "png" | "webp" | "jpeg" | "jpg";
 export type LooperOnUpdateEvent = (state: LooperTickState) => void;
 export type LooperEventNames = "update";
 export type AudioNode2DEvents = "end" | "play" | "playing" | "pause" | "update" | "load";
+export type AudioNode2DControllerNodes = BiquadFilterNode | StereoPannerNode | GainNode | AnalyserNode;
+export type AudioNode2DControllerNodeName = "BiquadFilter" | "StereoPanner" | "GainNode" | "AnalyserNode";
+export type AudioNode2DAnalyserFFTSize = 32 | 64 | 128 | 256 | 512 | 1024 | 2048 | 4096 | 8192 | 16384 | 32768;
 
 /*
  * Interface representing an object that will be returned
@@ -375,4 +378,12 @@ export interface SimplifiedImageData {
 	readonly width: number;
 	readonly height: number;
 	readonly hex: string;
+}
+
+declare global {
+	interface Window {
+		Stinky2D: any;
+		RenderingOptions: any;
+		EngineFlags: any;
+	}
 }

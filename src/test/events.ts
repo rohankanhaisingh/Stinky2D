@@ -1,4 +1,4 @@
-import { Renderer, Scene, Camera, Looper, Rectangle, MouseMoveObject, RenderObjectEventObject, AnimateInterger, RandomIntBetween, WaitFor, RandomColor } from "../index";
+import { Renderer, Scene, Camera, Looper, Rectangle, MouseMoveObject, RenderObjectEventObject, RandomIntBetween, WaitFor, RandomColor } from "../index";
 
 const scene = new Scene(innerWidth, innerHeight, document.querySelector(".app .container") as HTMLDivElement);
 const renderer = new Renderer(scene);
