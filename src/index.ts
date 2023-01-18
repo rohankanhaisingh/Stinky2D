@@ -14,7 +14,11 @@ export { Geometry2D } from "./classes/geometry-2d";
 export { Line2D, LineSystem2D } from "./classes/linesystem";
 export { SpritesheetController } from "./classes/spritesheet-controller";
 export { AudioSystem2D, AudioNode2D } from "./classes/audio-system-2d";
+export { Collection } from "./classes/collection";
+export { RigidBody2D } from "./classes/physics-2d";
+
 export { ColorCodes, RandomColor, ConvertHexToByteArray, ConvertByteArrayToHex } from "./constants/colors";
+
 export { UniqueID } from "./functions/uid"
 export { Easings } from "./functions/easings";
 
@@ -92,7 +96,9 @@ export {
 	SimplifiedImageData,
 	AudioNode2DControllerNodeName,
 	AudioNode2DControllerNodes,
-	AudioNode2DAnalyserFFTSize
+	AudioNode2DAnalyserFFTSize,
+	CollectionElementTypes,
+	RigidBody2DConstructor
 } from "./typings";
 
 import "./constants/global";

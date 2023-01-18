@@ -1,5 +1,6 @@
 import { AudioNode2D } from "./classes/audio-system-2d";
 import { RenderObject } from "./classes/renderobject";
+import { Vec2 } from "./functions/math";
 
 export type UniqueIDFilterKeywords = "numbers" | "letters" | "lettersUpperCase" | "lettersLowerCase";
 export type DragOffsetType = "center" | "offset";
@@ -16,6 +17,7 @@ export type AudioNode2DEvents = "end" | "play" | "playing" | "pause" | "update" 
 export type AudioNode2DControllerNodes = BiquadFilterNode | StereoPannerNode | GainNode | AnalyserNode;
 export type AudioNode2DControllerNodeName = "BiquadFilter" | "StereoPanner" | "GainNode" | "AnalyserNode";
 export type AudioNode2DAnalyserFFTSize = 32 | 64 | 128 | 256 | 512 | 1024 | 2048 | 4096 | 8192 | 16384 | 32768;
+export type CollectionElementTypes = "string" | "number" | "bigint" | "boolean" | "symbol" | "undefined" | "object" | "function";
 
 /*
  * Interface representing an object that will be returned
@@ -380,10 +382,22 @@ export interface SimplifiedImageData {
 	readonly hex: string;
 }
 
+export interface RigidBody2DConstructor {
+	id: string;
+	timestamp: number;
+	position: Vec2 | Vector2;
+	velocity: Vec2 | Vector2;
+	acceleration: Vec2 | Vector2;
+}
+
 declare global {
 	interface Window {
 		Stinky2D: any;
 		RenderingOptions: any;
 		EngineFlags: any;
+	}
+
+	interface String {
+		readonly bruh: () => void;
 	}
 }
