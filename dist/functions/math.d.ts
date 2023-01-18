@@ -63,4 +63,4 @@ export declare function Vec3(): Vector3;
  * @param y2 y-axis of second coordinate.
  */
 export declare function CalculateAtan(x1: number, y1: number, x2: number, y2: number): AtanCalculation;
-export declare function AnimateInterger(from: number, to: number, easing: EasingName, duration: number, resultCallback: (value: number) => void): void;
+export declare function AnimateInteger(from: number, to: number, easing: EasingName, duration: number, resultCallback: (value: number) => void): void;

@@ -1,12 +1,10 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AnimateInteger = exports.Vec3 = exports.Vec2 = exports.GetAverageArrayValue = exports.CalculateIntersection = exports.CalculateDistance = exports.CalculateAtan = exports.CalculateAngle = exports.RandomIntBetween = exports.LoadAudioSync = exports.SimplifyImageData = exports.LoadImageSync = exports.WaitFor = exports.Easings = exports.UniqueID = exports.ConvertByteArrayToHex = exports.ConvertHexToByteArray = exports.RandomColor = exports.ColorCodes = exports.RigidBody2D = exports.Collection = exports.AudioNode2D = exports.AudioSystem2D = exports.SpritesheetController = exports.LineSystem2D = exports.Line2D = exports.Geometry2D = exports.Circle = exports.TextNode = exports.Rectangle = exports.Looper = exports.Camera = exports.Renderer = exports.AllExistingRenderObjects = exports.RenderObject = exports.Scene = void 0;
 /**
  * Stinky2D library
  *
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.AnimateInterger = exports.Vec3 = exports.Vec2 = exports.GetAverageArrayValue = exports.CalculateIntersection = exports.CalculateDistance = exports.CalculateAtan = exports.CalculateAngle = exports.RandomIntBetween = exports.Easings = exports.SimplifyImageData = exports.LoadImageSync = exports.WaitFor = exports.UniqueID = exports.ConvertByteArrayToHex = exports.ConvertHexToByteArray = exports.RandomColor = exports.ColorCodes = exports.AudioNode2D = exports.AudioSystem2D = exports.SpritesheetController = exports.LineSystem2D = exports.Line2D = exports.Geometry2D = exports.Circle = exports.TextNode = exports.Rectangle = exports.Looper = exports.Camera = exports.Renderer = exports.AllExistingRenderObjects = exports.RenderObject = exports.Scene = void 0;
-window.Stinky2D = {};
-window.RenderingOptions = {};
 var scene_1 = require("./classes/scene");
 Object.defineProperty(exports, "Scene", { enumerable: true, get: function () { return scene_1.Scene; } });
 var renderobject_1 = require("./classes/renderobject");
@@ -34,6 +32,10 @@ Object.defineProperty(exports, "SpritesheetController", { enumerable: true, get:
 var audio_system_2d_1 = require("./classes/audio-system-2d");
 Object.defineProperty(exports, "AudioSystem2D", { enumerable: true, get: function () { return audio_system_2d_1.AudioSystem2D; } });
 Object.defineProperty(exports, "AudioNode2D", { enumerable: true, get: function () { return audio_system_2d_1.AudioNode2D; } });
+var collection_1 = require("./classes/collection");
+Object.defineProperty(exports, "Collection", { enumerable: true, get: function () { return collection_1.Collection; } });
+var physics_2d_1 = require("./classes/physics-2d");
+Object.defineProperty(exports, "RigidBody2D", { enumerable: true, get: function () { return physics_2d_1.RigidBody2D; } });
 var colors_1 = require("./constants/colors");
 Object.defineProperty(exports, "ColorCodes", { enumerable: true, get: function () { return colors_1.ColorCodes; } });
 Object.defineProperty(exports, "RandomColor", { enumerable: true, get: function () { return colors_1.RandomColor; } });
@@ -41,12 +43,13 @@ Object.defineProperty(exports, "ConvertHexToByteArray", { enumerable: true, get:
 Object.defineProperty(exports, "ConvertByteArrayToHex", { enumerable: true, get: function () { return colors_1.ConvertByteArrayToHex; } });
 var uid_1 = require("./functions/uid");
 Object.defineProperty(exports, "UniqueID", { enumerable: true, get: function () { return uid_1.UniqueID; } });
+var easings_1 = require("./functions/easings");
+Object.defineProperty(exports, "Easings", { enumerable: true, get: function () { return easings_1.Easings; } });
 var utilities_1 = require("./functions/utilities");
 Object.defineProperty(exports, "WaitFor", { enumerable: true, get: function () { return utilities_1.WaitFor; } });
 Object.defineProperty(exports, "LoadImageSync", { enumerable: true, get: function () { return utilities_1.LoadImageSync; } });
 Object.defineProperty(exports, "SimplifyImageData", { enumerable: true, get: function () { return utilities_1.SimplifyImageData; } });
-var easings_1 = require("./functions/easings");
-Object.defineProperty(exports, "Easings", { enumerable: true, get: function () { return easings_1.Easings; } });
+Object.defineProperty(exports, "LoadAudioSync", { enumerable: true, get: function () { return utilities_1.LoadAudioSync; } });
 var math_1 = require("./functions/math");
 Object.defineProperty(exports, "RandomIntBetween", { enumerable: true, get: function () { return math_1.RandomIntBetween; } });
 Object.defineProperty(exports, "CalculateAngle", { enumerable: true, get: function () { return math_1.CalculateAngle; } });
@@ -56,4 +59,5 @@ Object.defineProperty(exports, "CalculateIntersection", { enumerable: true, get:
 Object.defineProperty(exports, "GetAverageArrayValue", { enumerable: true, get: function () { return math_1.GetAverageArrayValue; } });
 Object.defineProperty(exports, "Vec2", { enumerable: true, get: function () { return math_1.Vec2; } });
 Object.defineProperty(exports, "Vec3", { enumerable: true, get: function () { return math_1.Vec3; } });
-Object.defineProperty(exports, "AnimateInterger", { enumerable: true, get: function () { return math_1.AnimateInterger; } });
+Object.defineProperty(exports, "AnimateInteger", { enumerable: true, get: function () { return math_1.AnimateInteger; } });
+require("./constants/global");

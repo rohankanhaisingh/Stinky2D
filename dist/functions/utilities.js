@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SimplifyImageData = exports.LoadImageSync = exports.WaitFor = void 0;
+exports.Bruh = exports.SimplifyImageData = exports.LoadAudioSync = exports.LoadImageSync = exports.WaitFor = void 0;
 const colors_1 = require("../constants/colors");
 /**
  * Asynchronous function that stops the program for a certain amount of time and then continues.
@@ -45,6 +45,29 @@ function LoadImageSync(url) {
     });
 }
 exports.LoadImageSync = LoadImageSync;
+/**
+ * Loads an audio asynchronously, and returns an HTMLAudioElement that can be used to play audio.
+ * An error is thrown if the source entered does not exist, or the file cannot be accessed.
+ * @param url Path of the audio.
+ * */
+function LoadAudioSync(url) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return new Promise(function (resolve, reject) {
+            const audio = document.createElement("audio");
+            audio.src = url;
+            audio.addEventListener("canplaythrough", function () {
+                resolve(audio);
+            });
+            audio.addEventListener("error", function () {
+                reject();
+            });
+        });
+    });
+}
+exports.LoadAudioSync = LoadAudioSync;
+/**
+ * Simplifies an object containing image data into readable content.
+ */
 function SimplifyImageData(imageData) {
     return {
         red: imageData.data[0],
@@ -58,3 +81,7 @@ function SimplifyImageData(imageData) {
     };
 }
 exports.SimplifyImageData = SimplifyImageData;
+function Bruh() {
+    throw new Error("Bruh");
+}
+exports.Bruh = Bruh;

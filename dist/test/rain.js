@@ -67,7 +67,7 @@ function createLightning(x) {
             newPosition = new index_1.Vec2(startPosition.x + (0, index_1.RandomIntBetween)(-roughness, roughness), lastPosition.y + segmentDistance);
             yield (0, index_1.WaitFor)(1);
         }
-        (0, index_1.AnimateInterger)(lineWidth, 0, "easeOutExpo", duration, width => lineSystem.SetStyleOnLines("lineWidth", width));
+        (0, index_1.AnimateInteger)(lineWidth, 0, "easeOutExpo", duration, width => lineSystem.SetStyleOnLines("lineWidth", width));
         setTimeout(function () {
             lineSystem.DestroyAllLines();
             renderer.Destroy(lineSystem);

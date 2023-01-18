@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AnimateInterger = exports.CalculateAtan = exports.Vec3 = exports.Vec2 = exports.CalculateIntersection = exports.CalculateAngle = exports.CalculateDistance = exports.GetAverageArrayValue = exports.RandomIntBetween = void 0;
+exports.AnimateInteger = exports.CalculateAtan = exports.Vec3 = exports.Vec2 = exports.CalculateIntersection = exports.CalculateAngle = exports.CalculateDistance = exports.GetAverageArrayValue = exports.RandomIntBetween = void 0;
 const easings_1 = require("./easings");
 /**
  * Generates a random number between two numbers.
@@ -196,7 +196,7 @@ function CalculateAtan(x1, y1, x2, y2) {
     };
 }
 exports.CalculateAtan = CalculateAtan;
-function AnimateInterger(from, to, easing, duration, resultCallback) {
+function AnimateInteger(from, to, easing, duration, resultCallback) {
     if (typeof from !== "number")
         throw new Error("Cannot animate integer because starting value is not defined.");
     if (typeof to !== "number")
@@ -219,4 +219,4 @@ function AnimateInterger(from, to, easing, duration, resultCallback) {
     };
     updateTick();
 }
-exports.AnimateInterger = AnimateInterger;
+exports.AnimateInteger = AnimateInteger;
