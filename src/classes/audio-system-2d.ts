@@ -1,12 +1,36 @@
 import { Vec2 } from "../functions/math";
 import { UniqueID } from "../functions/uid";
-import { AudioNode2DConstructor, AudioNode2DControllerNodes, AudioNode2DControllerNodeName, AudioNode2DEvents, AudioSystem2DConstructor, Vector2, AudioNode2DAnalyserFFTSize } from "../typings";
+import {
+	AudioNode2DConstructor,
+	AudioNode2DControllerNodes,
+	AudioNode2DControllerNodeName,
+	AudioNode2DEvents,
+	AudioSystem2DConstructor,
+	Vector2,
+	AudioNode2DAnalyserFFTSize,
+	CompressorPresetsMap
+} from "../typings";
 import { RenderObject } from "./renderobject";
+
+export const AudioNode2DCompressorPresets: CompressorPresetsMap = {
+	"master-no-clip": {
+		threshold: -50,
+		knee: 40,
+		ratio: 12,
+		attack: 0,
+		release: 0.25
+	}
+};
 
 export class AudioNode2D implements AudioNode2DConstructor {
 
 	public id = UniqueID(18).id;
 	public timestamp = Date.now();
+
+	public attachedRenderObject: RenderObject | null = null;
+
+	public isAudible: boolean = true;
+	public playWhenAudible: boolean = false;
 
 	declare public convolver: ConvolverNode;
 	declare public gainNode: GainNode;
@@ -281,7 +305,13 @@ export class AudioNode2D implements AudioNode2DConstructor {
 		};
 	}
 
-	/** Plays the audio node with all effects set. */
+	/** 
+	 * Plays the audio node with all effects set. 
+	 * 
+	 * Does not play when property 'playWhenAudible' is set to true,
+	 * because the AudioSystem2D connected to this node will automatically play
+	 * the node when the listener is within the audio range.
+	 **/
 	public Play(timestamp?: number) {
 
 		if (typeof timestamp === "number") {
@@ -299,6 +329,8 @@ export class AudioNode2D implements AudioNode2DConstructor {
 
 			return;
 		}
+
+		if (this.playWhenAudible) return;
 
 		this.audioSource.play();
 
@@ -529,6 +561,7 @@ export class AudioNode2D implements AudioNode2DConstructor {
 		this.analyser.disconnect();
 
 		this.audioSource.remove();
+		this.audioSource.src = "";
 
 		this.audioSystem.DestroyAudioNode2D(this);
 
@@ -605,6 +638,54 @@ export class AudioNode2D implements AudioNode2DConstructor {
 
 		delete this.events[event];
 	}
+
+	public AttachRenderObject(renderObject: RenderObject) {
+
+		this.attachedRenderObject = renderObject;
+
+		const existingAudioNodes: AudioNode2D[] = renderObject.audioNodes;
+
+		for (let i = 0; i < existingAudioNodes.length; i++) {
+
+			const node: AudioNode2D = existingAudioNodes[i];
+
+			if (this.id === node.id) throw new Error("Cannot re-attach audio node on render object since it already has been attached.");
+		}
+
+		renderObject.audioNodes.push(this);
+	}
+
+	public DetachRenderObject() {
+
+		if (this.attachedRenderObject === null || !this.attachedRenderObject) return;
+
+		const existingAudioNodes: AudioNode2D[] = this.attachedRenderObject.audioNodes;
+
+		for (let i = 0; i < existingAudioNodes.length; i++) {
+
+			const node: AudioNode2D = existingAudioNodes[i];
+
+			if (this.id === node.id) {
+
+				this.attachedRenderObject.audioNodes.splice(i, 1);
+
+				break;
+			}
+		}
+
+		this.attachedRenderObject = null;
+	}
+
+	public Update(deltaTime: number) {
+
+		if (this.attachedRenderObject) {
+
+			this.x = this.attachedRenderObject.x;
+			this.y = this.attachedRenderObject.y;
+		}
+
+	}
+
 }
 
 export class AudioSystem2D implements AudioSystem2DConstructor {
@@ -776,7 +857,20 @@ export class AudioSystem2D implements AudioSystem2DConstructor {
 		return this;
 	}
 
-	public Update(): void {
+	public UseCompressorPreset<K extends keyof CompressorPresetsMap>(preset: K) {
+
+		if (!(preset in AudioNode2DCompressorPresets)) return null;
+
+		const p = AudioNode2DCompressorPresets[preset];
+
+		this.SetCompressorThresholdValue(p.threshold);
+		this.SetCompressorKneeValue(p.knee);
+		this.SetCompressorRatioValue(p.ratio);
+		this.SetCompressorAttackValue(p.attack);
+		this.SetCompressorReleaseValue(p.release);
+	}
+
+	public Update(deltaTime: number): void {
 
 		if (!this.attachedRenderObject) return;
 
@@ -786,6 +880,8 @@ export class AudioSystem2D implements AudioSystem2DConstructor {
 		for (let i = 0; i < nodes.length; i++) {
 
 			const node: AudioNode2D = nodes[i];
+
+			node.Update(deltaTime);
 
 			if (node.enable2DFilterManpulation) {
 
@@ -801,10 +897,27 @@ export class AudioSystem2D implements AudioSystem2DConstructor {
 					node.filterFrequencyValue = (node.filterFrequencyMinValue + node.filterFrequencyMaxValue) - filter;
 					node.panValue = (node.x >= renderObject.x) ? panning : -panning;
 					node.mainVolume = volume;
+
+					node.isAudible = true;
+
+					if (node.playWhenAudible) node.audioSource.play();
+
 				} else {
 
 					node.mainVolume = 0;
 					node.filterFrequencyValue = 22050;
+
+					node.isAudible = false;
+
+					if (node.playWhenAudible) {
+
+						try {
+
+							node.audioSource.pause();
+						} catch (err) {
+
+						}
+					}
 				}
 			}
 		}
