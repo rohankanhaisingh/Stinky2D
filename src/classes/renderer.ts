@@ -1,9 +1,10 @@
-import { CameraConstructor, RendererAttributes, RendererConstructor, Rendering, SceneConstructor, TransformMatrices, UniqueIDFilterKeywords } from "../typings";
+import { CameraConstructor, RendererAttributes, RendererConstructor, Rendering, RenderObjectDataAttributes, SceneConstructor, TransformMatrices, UniqueIDFilterKeywords } from "../typings";
 import { Scene } from "./scene";
 import { UniqueID } from "../functions/uid";
 import { Camera } from "./camera";
 import { RenderObject } from "./renderobject";
 import { SpritesheetController } from "./spritesheet-controller";
+import { Collection } from "./collection";
 
 export class Renderer implements RendererConstructor {
 
@@ -41,7 +42,7 @@ export class Renderer implements RendererConstructor {
 		window.Stinky2D[this.id] = this;
 	}
 
-	/**Clears the entire scene, which will end up showing a black scene. */
+	/** Clears the entire scene, which will end up showing a black scene. */
 	public ClearScene(): Renderer {
 
 		const ctx: CanvasRenderingContext2D = this.context;
@@ -229,6 +230,8 @@ export class Renderer implements RendererConstructor {
 
 		this.renderObjects.push(renderObject);
 
+		renderObject.OnAdd(this);
+
 		return renderObject;
 	}
 
@@ -265,8 +268,11 @@ export class Renderer implements RendererConstructor {
 	 * The greater the value of the desired width and height of the analysis, the more time it will take to perform the analysis.
 	 * WebGL can be used to make the analysis faster, through the graphics card.
 	 * */
-	public GetImageData(startX: number, startY: number, width: number, height: number): ImageData {
-		return this.context.getImageData(startX, startY, width, height, { colorSpace: "display-p3" });
+	public GetImageData(startX: number, startY: number, width: number, height: number, colorSpace?: PredefinedColorSpace): ImageData {
+
+		return this.context.getImageData(startX, startY, width, height, {
+			colorSpace: colorSpace ? colorSpace : "display-p3"
+		});
 	}
 
 	public Destroy(renderObject: RenderObject): Renderer {
@@ -283,5 +289,41 @@ export class Renderer implements RendererConstructor {
 		}
 
 		return this;
+	}
+
+	/**
+	 * Searches a render object by filtering specific attributes and checking the 
+	 * value if they match the entered values.
+	 * 
+	 * This method returns either the found render object stored in an array, or null 
+	 * if no object has been found.
+	 * 
+	 * The returning array with render objects can automatically be stored in a Collection
+	 * instance if the argument 'useCollection' is set to true.
+	 * */
+	public GetObjectByDataAttribute(attributeName: RenderObjectDataAttributes, attributeValue: string, useCollection?: boolean): RenderObject[] | Collection<RenderObject> | null {
+
+		const objects: RenderObject[] = this.renderObjects;
+
+		const foundObjects: RenderObject[] = [];
+
+		for (const object of objects) {
+
+			if (typeof object.attributes[attributeName] === "string") {
+
+				if (object.attributes[attributeName] === attributeValue) {
+
+					foundObjects.push(object);
+				}
+			}
+		}
+
+		if (foundObjects.length === 0) return null;
+
+		return useCollection === true ? new Collection<RenderObject>(foundObjects) : foundObjects;
+	}
+
+	public QuerySelector(selector: string) {
+
 	}
 }

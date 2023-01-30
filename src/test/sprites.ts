@@ -1,4 +1,4 @@
-import { Scene, Renderer, Camera, Looper, SpritesheetController, Rectangle, LooperTickState, ColorCodes, LoadImageSync, RenderObjectEventObject, RandomIntBetween, AnimateInteger } from "../index";
+import { Scene, Renderer, Camera, Looper, SpritesheetController, Rectangle, LooperTickState, ColorCodes, LoadImageSync, RandomIntBetween, AnimateInteger } from "../index";
 
 const scene = new Scene(innerWidth, innerHeight, document.querySelector(".app .container") as HTMLDivElement);
 const renderer = new Renderer(scene);
@@ -41,25 +41,19 @@ function createQuestionButton(x: number, y: number, textures: HTMLImageElement[]
 		shadowColor: "#1d1d1d",
 	})) as Rectangle;
 
-	rect.AddEventListener("mouseEnter", function (event: RenderObjectEventObject) {
+	rect.AddEventListener("mouseEnter", function (event) {
 
 		event.target.styles.shadowBlur = 2;
 		event.target.styles.shadowOffsetX = -10;
 		event.target.styles.shadowOffsetY = 10;
 	});
 
-	rect.AddEventListener("mouseOut", function (event: RenderObjectEventObject) {
+	rect.AddEventListener("mouseOut", function (event) {
 
 		event.target.styles.shadowBlur = 0;
 		event.target.styles.shadowOffsetX = 0;
 		event.target.styles.shadowOffsetY = 0;
 	});
-
-	rect.AddEventListener("mouseDown", function (event: RenderObjectEventObject) {
-
-		AnimateInteger(0, 360, "easeOutElastic", 3000, rotation => event.target.rotation = rotation);
-	});
-
 
 	const spritesheetController = new SpritesheetController(textures, rect);
 

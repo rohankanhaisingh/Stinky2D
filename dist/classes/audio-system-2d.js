@@ -1,7 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AudioSystem2D = exports.AudioNode2D = void 0;
+exports.AudioSystem2D = exports.AudioNode2D = exports.AudioNode2DCompressorPresets = void 0;
 const uid_1 = require("../functions/uid");
+exports.AudioNode2DCompressorPresets = {
+    "master-no-clip": {
+        threshold: -50,
+        knee: 40,
+        ratio: 12,
+        attack: 0,
+        release: 0.25
+    }
+};
 class AudioNode2D {
     /**
      * Creates an audio node in which to configure audio.
@@ -23,6 +32,9 @@ class AudioNode2D {
         this.range = range;
         this.id = (0, uid_1.UniqueID)(18).id;
         this.timestamp = Date.now();
+        this.attachedRenderObject = null;
+        this.isAudible = true;
+        this.playWhenAudible = false;
         this.events = {};
         this.enable2DFilterManpulation = true;
         const ctx = audioSystem.ctx;
@@ -210,7 +222,13 @@ class AudioNode2D {
             y: this.y
         };
     }
-    /** Plays the audio node with all effects set. */
+    /**
+     * Plays the audio node with all effects set.
+     *
+     * Does not play when property 'playWhenAudible' is set to true,
+     * because the AudioSystem2D connected to this node will automatically play
+     * the node when the listener is within the audio range.
+     **/
     Play(timestamp) {
         if (typeof timestamp === "number") {
             if (timestamp >= 0 && timestamp <= this.audioSource.duration) {
@@ -223,6 +241,8 @@ class AudioNode2D {
             }
             return;
         }
+        if (this.playWhenAudible)
+            return;
         this.audioSource.play();
         return this;
     }
@@ -402,6 +422,7 @@ class AudioNode2D {
         this.lowPassFilter.disconnect();
         this.analyser.disconnect();
         this.audioSource.remove();
+        this.audioSource.src = "";
         this.audioSystem.DestroyAudioNode2D(this);
         return true;
     }
@@ -458,6 +479,35 @@ class AudioNode2D {
         if (typeof this.events[event] !== "function")
             return false;
         delete this.events[event];
+    }
+    AttachRenderObject(renderObject) {
+        this.attachedRenderObject = renderObject;
+        const existingAudioNodes = renderObject.audioNodes;
+        for (let i = 0; i < existingAudioNodes.length; i++) {
+            const node = existingAudioNodes[i];
+            if (this.id === node.id)
+                throw new Error("Cannot re-attach audio node on render object since it already has been attached.");
+        }
+        renderObject.audioNodes.push(this);
+    }
+    DetachRenderObject() {
+        if (this.attachedRenderObject === null || !this.attachedRenderObject)
+            return;
+        const existingAudioNodes = this.attachedRenderObject.audioNodes;
+        for (let i = 0; i < existingAudioNodes.length; i++) {
+            const node = existingAudioNodes[i];
+            if (this.id === node.id) {
+                this.attachedRenderObject.audioNodes.splice(i, 1);
+                break;
+            }
+        }
+        this.attachedRenderObject = null;
+    }
+    Update(deltaTime) {
+        if (this.attachedRenderObject) {
+            this.x = this.attachedRenderObject.x;
+            this.y = this.attachedRenderObject.y;
+        }
     }
 }
 exports.AudioNode2D = AudioNode2D;
@@ -584,13 +634,24 @@ class AudioSystem2D {
         this.compressor.threshold.setValueAtTime(value, this.ctx.currentTime);
         return this;
     }
-    Update() {
+    UseCompressorPreset(preset) {
+        if (!(preset in exports.AudioNode2DCompressorPresets))
+            return null;
+        const p = exports.AudioNode2DCompressorPresets[preset];
+        this.SetCompressorThresholdValue(p.threshold);
+        this.SetCompressorKneeValue(p.knee);
+        this.SetCompressorRatioValue(p.ratio);
+        this.SetCompressorAttackValue(p.attack);
+        this.SetCompressorReleaseValue(p.release);
+    }
+    Update(deltaTime) {
         if (!this.attachedRenderObject)
             return;
         const renderObject = this.attachedRenderObject;
         const nodes = this.nodes;
         for (let i = 0; i < nodes.length; i++) {
             const node = nodes[i];
+            node.Update(deltaTime);
             if (node.enable2DFilterManpulation) {
                 const distance = Math.sqrt(Math.pow((renderObject.x - node.x), 2) + Math.pow((renderObject.y - node.y), 2));
                 const horizontalDistance = Math.sqrt(Math.pow(renderObject.x - node.x, 2));
@@ -601,10 +662,21 @@ class AudioSystem2D {
                     node.filterFrequencyValue = (node.filterFrequencyMinValue + node.filterFrequencyMaxValue) - filter;
                     node.panValue = (node.x >= renderObject.x) ? panning : -panning;
                     node.mainVolume = volume;
+                    node.isAudible = true;
+                    if (node.playWhenAudible)
+                        node.audioSource.play();
                 }
                 else {
                     node.mainVolume = 0;
                     node.filterFrequencyValue = 22050;
+                    node.isAudible = false;
+                    if (node.playWhenAudible) {
+                        try {
+                            node.audioSource.pause();
+                        }
+                        catch (err) {
+                        }
+                    }
                 }
             }
         }

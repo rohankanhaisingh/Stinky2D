@@ -1,5 +1,6 @@
+import { Vec2 } from "../functions/math";
 import { UniqueID } from "../functions/uid";
-import { CameraConstructor, MouseDownObject, MouseEnterObject, MouseMoveObject, MouseOutObject, MouseUpObject, MouseWheelObject, RendererConstructor, SceneAttributes, SceneConstructor, SceneEvents, SceneImageFormat, SceneMouseObject, Vector2 } from "../typings";
+import { CameraConstructor, MouseDownObject, MouseEnterObject, MouseMoveObject, MouseOutObject, MouseUpObject, MouseWheelObject, RendererConstructor, SceneAttributes, SceneConstructor, SceneEventsMap, SceneImageFormat, SceneMouseObject, Vector2 } from "../typings";
 import { Camera } from "./camera";
 import { Renderer } from "./renderer";
 
@@ -243,7 +244,8 @@ export class Scene implements SceneConstructor {
 	}
 
 	/**
-	 * Exports the canvas element to an image.
+	 * Exports the canvas element to an image using a specific
+	 * image format. The recommended image format is "png".
 	 * 
 	 * Will return ``null`` if the given format is unknown.
 	 * @param format
@@ -263,7 +265,7 @@ export class Scene implements SceneConstructor {
 	 * @param event
 	 * @param cb
 	 */
-	public AddEventListener(event: SceneEvents, cb: (event: any) => void): Scene {
+	public AddEventListener<K extends keyof SceneEventsMap>(event: K, cb: SceneEventsMap[K]): Scene {
 
 		if (typeof this.events[event] === "function") {
 
@@ -278,11 +280,12 @@ export class Scene implements SceneConstructor {
 	}
 
 	/**
-	 * Removes an existing event listener.
+	 * Removes an existing event listener, returning a boolean describing
+	 * the state of the removal.
 	 * 
 	 * @param event
 	 */
-	public RemoveEventListener(event: SceneEvents): boolean {
+	public RemoveEventListener<K extends keyof SceneEventsMap>(event: K): boolean {
 
 		if (typeof this.events[event] === "undefined") return false;
 
@@ -291,6 +294,12 @@ export class Scene implements SceneConstructor {
 		return true;
 	}
 
+	/**
+	 * Calculates the fixed mouse position based on the applied camera position
+	 * and the mouse position, returning a Vector2 typeof object.
+	 * 
+	 * Note that if no camera has been applied, the normal mouse position will be returned.
+	 */
 	public GetFixedMousePosition(): Vector2 {
 
 		if (!this.camera) return {
@@ -302,5 +311,19 @@ export class Scene implements SceneConstructor {
 			x: (this.mouse.x - this.camera.x) / this.camera.scaleX,
 			y: (this.mouse.y - this.camera.y) / this.camera.scaleY,
 		}
+	}
+
+	/**
+	 * Calculates the center coordinate of the canvas element
+	 * and returns a Vec2 class instance containing the calculated values.
+	 * 
+	 * Requires no arguments.
+	 */
+	public Center(): Vec2 {
+
+		const x: number = this.canvasElement.width / 2;
+		const y: number = this.canvasElement.height / 2;
+
+		return new Vec2(x, y);
 	}
 }

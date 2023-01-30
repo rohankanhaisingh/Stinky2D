@@ -1,3 +1,4 @@
+import { EasingName } from "../typings";
 export declare const ColorCodes: {
     ABBEY: string;
     ABSOLUTE_ZERO: string;
@@ -2347,3 +2348,7 @@ export declare function ConvertByteArrayToHex(bytes: number[]): string;
  * @param hex Heximal string
  */
 export declare function FixedHexToRgbArray(hex: string): number[] | null;
+/**
+ * Animates a heximal color string.
+ **/
+export declare function AnimateHeximalColor(from: string, to: string, easing: EasingName, duration: number, cb: (color: string) => void): void;

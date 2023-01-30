@@ -1,7 +1,20 @@
 import { ConvertByteArrayToHex, ConvertHexToByteArray, FixedHexToRgbArray } from "../constants/colors";
 import { Easings } from "../functions/easings";
 import { UniqueID } from "../functions/uid";
-import { Dimension2D, EasingName, RenderObjectConstructor, RenderObjectEventObject, RenderObjectEvents, RenderObjectStyleApplyingResults, RenderObjectStyles, SpritesheetControllerConstructor, Vector2 } from "../typings";
+import {
+	Dimension2D,
+	EasingName,
+	RenderObjectConstructor,
+	RenderObjectDataAttributes,
+	RenderObjectEventMap,
+	RenderObjectRenderEvent,
+	RenderObjectStyleApplyingResults,
+	RenderObjectStyles,
+	RenderObjectTransformProperty,
+	SpritesheetControllerConstructor,
+	Vector2
+} from "../typings";
+import { AudioNode2D } from "./audio-system-2d";
 import { Renderer } from "./renderer";
 import { Scene } from "./scene";
 import { SpritesheetController } from "./spritesheet-controller";
@@ -26,8 +39,11 @@ export class RenderObject implements RenderObjectConstructor {
 	public visible: boolean = true;
 	public forceRendering: boolean = false;
 
-	public events: {[key: string]: (event: RenderObjectEventObject) => void} = {};
+	public attributes: { [K in RenderObjectDataAttributes]?: string } = {};
+
+	public events: {[key: string]: Function} = {};
 	public eventsOnce: { [key: string]: Function } = {};
+
 	public eventStates = {
 		hasEntered: false,
 		hasLeft: false,
@@ -36,6 +52,11 @@ export class RenderObject implements RenderObjectConstructor {
 		isUp: false
 	};
 
+	public children: RenderObject[] = [];
+
+	public audioNodes: AudioNode2D[] = [];
+
+
 	declare public x: number;
 	declare public y: number;
 	declare public width: number;
@@ -43,12 +64,16 @@ export class RenderObject implements RenderObjectConstructor {
 	declare public radius: number;
 	declare public segments: Vector2[];
 	declare public styles: RenderObjectStyles;
+
+	declare public transform: number[] | null;
+	declare public scaling: Vector2 | null;
+
 	declare public rotation: number;
 
 	declare public velocityX: number;
 	declare public velocityY: number;
-	declare public gravitationalAcceleration: number;
-	declare public objectWeight: number;
+	declare public acceleration: number;
+	declare public mass: number;
 
 	declare public scene: Scene;
 	declare public renderer: Renderer;
@@ -60,6 +85,9 @@ export class RenderObject implements RenderObjectConstructor {
 
 	constructor() {
 
+		this.transform = null;
+		this.scaling = null;
+
 		AllExistingRenderObjects.push(this);
 	}
 
@@ -70,6 +98,11 @@ export class RenderObject implements RenderObjectConstructor {
 	public Update(ctx: CanvasRenderingContext2D, deltaTime: number) {
 
 		return 0;
+	}
+
+	public OnAdd(renderer: Renderer) {
+
+		return;
 	}
 
 	private _updateOnMouseOverEvent() {
@@ -154,6 +187,14 @@ export class RenderObject implements RenderObjectConstructor {
 		if (typeof this.renderer.camera === "undefined") return;
 
 		this._updateOnMouseOverEvent();
+
+		if (this.visible) {
+
+			if (typeof this.events["render"] === "function") this.events["render"]({
+				target: this,
+				timestamp: Date.now()
+			} as RenderObjectRenderEvent);
+		}
 	}
 
 
@@ -500,7 +541,7 @@ export class RenderObject implements RenderObjectConstructor {
 	 * @param event
 	 * @param cb
 	 */
-	public AddEventListener(event: RenderObjectEvents, cb: (event: RenderObjectEventObject) => void): RenderObject {
+	public AddEventListener<K extends keyof RenderObjectEventMap>(event: K, cb: RenderObjectEventMap[K]): RenderObject {
 
 		if (typeof event !== "string") throw new Error("Cannot add event since event argument is not a string type.");
 		if (typeof cb !== "function") throw new Error("Cannot add event since callback argument is not a function type."); 
@@ -513,6 +554,44 @@ export class RenderObject implements RenderObjectConstructor {
 		}
 
 		return this;
+	}
+
+	/**
+	 * Sets a data attribute to this instance, allowing every 
+	 * instance to be unique.
+	 * 
+	 * @param attributeName Name of attribute.
+	 * @param value Value of attribute, which has to be a string.
+	 */
+	public SetDataAttribute(attributeName: RenderObjectDataAttributes, value: string): RenderObject {
+
+		this.attributes[attributeName] = value;
+
+		return this;
+	}
+
+	/**
+	 * Returns a set attribute with its value. The value can be either 
+	 * a string or null if no attribute is set.
+	 * 
+	 * @param attributeName Name of attribute.
+	 * */
+	public GetDataAttribute(attributeName: RenderObjectDataAttributes): string | null {
+
+		const foundAttribute = this.attributes[attributeName];
+
+		return typeof foundAttribute === "undefined" ? null : foundAttribute;
+	}
+
+	/**
+	 * Sets a style property on this render object instance. 
+	 * 
+	 * @param style Key of the RenderObjectStyles interface.
+	 * @param value Value of the style.
+	*/
+	public SetStyle(style: keyof RenderObjectStyles, value: any): any {
+
+		return this.styles[style] = value;
 	}
 
 	// =============== Static methods ===============
@@ -581,5 +660,143 @@ export class RenderObject implements RenderObjectConstructor {
 
 		updateTick();
 
+	}
+
+	/**
+	 * Set the scaling on this render object using a
+	 * Vector2 represented number object.
+	 **/
+	public SetScaling(scale: Vector2): RenderObject {
+
+		this.scaling = scale;
+
+		return this;
+	}
+
+	/**
+	 * Set the scale x property on this render object.
+	 * Or return the current set x scaling value of this object 
+	 * as a number.
+	 * */
+	public ScaleX(number?: number): number | null {
+
+		if (typeof number === "number") {
+
+			if (this.scaling === null) this.scaling = {
+				x: 1,
+				y: 1
+			}
+
+			this.scaling.x = number;
+
+			return this.scaling.x;
+		}
+
+		return this.scaling === null ? null : this.scaling.x;
+	}
+
+
+	/**
+	 * Set the scale y property on this render object.
+	 * Or return the current set y scaling value of this object 
+	 * as a number.
+	 * */
+	public ScaleY(number?: number): number | null {
+
+		if (typeof number === "number") {
+
+			if (this.scaling === null) this.scaling = {
+				x: 1,
+				y: 1
+			}
+
+			this.scaling.y = number;
+
+			return this.scaling.y;
+		}
+
+		return this.scaling === null ? null : this.scaling.y;
+	}
+
+	/** Disables scaling which may imrove the rendering performance. */
+	public DisableScaling(): RenderObject {
+
+		this.scaling = null;
+
+		return this;
+	}
+
+	/** 
+	 *  Enables scaling by setting the values for both x and y to 1 by default.
+	 *  
+	 *  This method is optional to enable scaling. Scaling can also be enabled using
+	 *  the following methods:
+	 *  
+	 *  SetScaling(scalingObject);
+	 *  ScaleX(scale);
+	 *  ScaleY(scale);
+	 */
+	public EnableScaling(): RenderObject {
+		this.scaling = { x: 1, y: 1 };
+
+		return this;
+	}
+
+	public SetTransform(
+		horizontalScaling: number,
+		verticalSkewing: number,
+		horizontalSkewing: number,
+		verticalScaling: number,
+		horizontalTranslation: number,
+		verticalTranslation: number
+	): RenderObject {
+
+		this.transform = [
+			horizontalScaling,
+			verticalSkewing,
+			horizontalSkewing,
+			verticalScaling,
+			horizontalTranslation,
+			verticalTranslation
+		];
+
+		return this;
+	}
+
+	/**
+	 * Gets a specific transform property and return its value.
+	 * 
+	 * Will return null if the transform property does not contain valid values.
+	 * */
+	public GetTransformProperty(transformProperty: RenderObjectTransformProperty): number | null {
+
+		if (this.transform === null) return null;
+
+		switch (transformProperty) {
+			case "hozirontalScaling": return this.transform[0];
+			case "verticalSkewing": return this.transform[1];
+			case "horizontalSkewing": return this.transform[2];
+			case "verticalScaling": return this.transform[3];
+			case "horizontalTranslation": return this.transform[4];
+			case "verticalTranslation": return this.transform[5];
+		}
+
+		return null;
+	}
+
+	public SetTransformProperty(transformProperty: RenderObjectTransformProperty, value: number) {
+
+		if (this.transform === null) return null;
+
+		switch (transformProperty) {
+			case "hozirontalScaling": this.transform[0] = value;
+			case "verticalSkewing": this.transform[1] = value;
+			case "horizontalSkewing": this.transform[2] = value;
+			case "verticalScaling": this.transform[3] = value;
+			case "horizontalTranslation": this.transform[4] = value;
+			case "verticalTranslation": this.transform[5] = value;
+		}
+
+		return this.transform;
 	}
 }

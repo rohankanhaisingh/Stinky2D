@@ -1,7 +1,8 @@
-import { CameraConstructor, RendererAttributes, RendererConstructor, Rendering, SceneConstructor, TransformMatrices } from "../typings";
+import { CameraConstructor, RendererAttributes, RendererConstructor, Rendering, RenderObjectDataAttributes, SceneConstructor, TransformMatrices } from "../typings";
 import { Scene } from "./scene";
 import { Camera } from "./camera";
 import { RenderObject } from "./renderobject";
+import { Collection } from "./collection";
 export declare class Renderer implements RendererConstructor {
     id: string;
     timestamp: number;
@@ -22,7 +23,7 @@ export declare class Renderer implements RendererConstructor {
      * @param attributes Attributes specifying the behaviour of the renderer.
      */
     constructor(scene: Scene | SceneConstructor, attributes?: RendererAttributes);
-    /**Clears the entire scene, which will end up showing a black scene. */
+    /** Clears the entire scene, which will end up showing a black scene. */
     ClearScene(): Renderer;
     /**
      * This method paints the entire scene using the given color.
@@ -64,6 +65,18 @@ export declare class Renderer implements RendererConstructor {
      * The greater the value of the desired width and height of the analysis, the more time it will take to perform the analysis.
      * WebGL can be used to make the analysis faster, through the graphics card.
      * */
-    GetImageData(startX: number, startY: number, width: number, height: number): ImageData;
+    GetImageData(startX: number, startY: number, width: number, height: number, colorSpace?: PredefinedColorSpace): ImageData;
     Destroy(renderObject: RenderObject): Renderer;
+    /**
+     * Searches a render object by filtering specific attributes and checking the
+     * value if they match the entered values.
+     *
+     * This method returns either the found render object stored in an array, or null
+     * if no object has been found.
+     *
+     * The returning array with render objects can automatically be stored in a Collection
+     * instance if the argument 'useCollection' is set to true.
+     * */
+    GetObjectByDataAttribute(attributeName: RenderObjectDataAttributes, attributeValue: string, useCollection?: boolean): RenderObject[] | Collection<RenderObject> | null;
+    QuerySelector(selector: string): void;
 }

@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Renderer = void 0;
 const uid_1 = require("../functions/uid");
 const camera_1 = require("./camera");
+const collection_1 = require("./collection");
 class Renderer {
     /**
      * By creating a 'renderer' instance, the program can draw images.
@@ -26,7 +27,7 @@ class Renderer {
         scene.renderer = this;
         window.Stinky2D[this.id] = this;
     }
-    /**Clears the entire scene, which will end up showing a black scene. */
+    /** Clears the entire scene, which will end up showing a black scene. */
     ClearScene() {
         const ctx = this.context;
         const scene = this.scene;
@@ -173,6 +174,7 @@ class Renderer {
         renderObject.scene = this.scene;
         renderObject.renderer = this;
         this.renderObjects.push(renderObject);
+        renderObject.OnAdd(this);
         return renderObject;
     }
     /**Enables the ability to analyze the colors in the rendered image */
@@ -205,8 +207,10 @@ class Renderer {
      * The greater the value of the desired width and height of the analysis, the more time it will take to perform the analysis.
      * WebGL can be used to make the analysis faster, through the graphics card.
      * */
-    GetImageData(startX, startY, width, height) {
-        return this.context.getImageData(startX, startY, width, height, { colorSpace: "display-p3" });
+    GetImageData(startX, startY, width, height, colorSpace) {
+        return this.context.getImageData(startX, startY, width, height, {
+            colorSpace: colorSpace ? colorSpace : "display-p3"
+        });
     }
     Destroy(renderObject) {
         for (let i = 0; i < this.renderObjects.length; i++) {
@@ -217,6 +221,32 @@ class Renderer {
             }
         }
         return this;
+    }
+    /**
+     * Searches a render object by filtering specific attributes and checking the
+     * value if they match the entered values.
+     *
+     * This method returns either the found render object stored in an array, or null
+     * if no object has been found.
+     *
+     * The returning array with render objects can automatically be stored in a Collection
+     * instance if the argument 'useCollection' is set to true.
+     * */
+    GetObjectByDataAttribute(attributeName, attributeValue, useCollection) {
+        const objects = this.renderObjects;
+        const foundObjects = [];
+        for (const object of objects) {
+            if (typeof object.attributes[attributeName] === "string") {
+                if (object.attributes[attributeName] === attributeValue) {
+                    foundObjects.push(object);
+                }
+            }
+        }
+        if (foundObjects.length === 0)
+            return null;
+        return useCollection === true ? new collection_1.Collection(foundObjects) : foundObjects;
+    }
+    QuerySelector(selector) {
     }
 }
 exports.Renderer = Renderer;

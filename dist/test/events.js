@@ -1,4 +1,16 @@
 "use strict";
+/**
+ * Events
+ * by Rohan Kanhaisingh
+ *
+ * -----------------------------------------------
+ *
+ * This example demonstrates event listeners on
+ * graphical elements, for example a rectangle.
+ *
+ * Each event listener has their own event object map
+ * including data about the event itself.
+ **/
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -34,20 +46,24 @@ function createSquares() {
             const y = (0, index_1.RandomIntBetween)(0, scene.height);
             const square = renderer.Add(new index_1.Rectangle(x, y, 30, 30, { backgroundColor: (0, index_1.RandomColor)(), borderWidth: 3 }));
             square.Center(x, y);
+            // Sets an event listener on the rectangle which gets triggered when the user enters the mouse in the object.
             square.AddEventListener("mouseEnter", function (event) {
                 event.target.styles.shadowBlur = 10;
                 event.target.styles.shadowColor = event.target.styles.backgroundColor;
             });
+            // Same happening, but when the user is leaving the mouse.
             square.AddEventListener("mouseOut", function (event) {
                 event.target.styles.shadowBlur = 0;
                 event.target.styles.shadowColor = undefined;
             });
+            // Yeah... It speaks for itself.
             square.AddEventListener("mouseDown", function (event) {
                 event.target.AnimateCurrentPosition({
                     x: (0, index_1.RandomIntBetween)(0, scene.width),
                     y: (0, index_1.RandomIntBetween)(0, scene.height)
                 }, "easeOutElastic", 2000);
             });
+            // And also this.
             square.AddEventListener("mouseWheel", function (event) {
                 switch (event.mouse.wheelDirection) {
                     case "up":

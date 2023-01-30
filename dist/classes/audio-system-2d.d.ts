@@ -1,6 +1,7 @@
 import { Vec2 } from "../functions/math";
-import { AudioNode2DConstructor, AudioNode2DControllerNodes, AudioNode2DControllerNodeName, AudioNode2DEvents, AudioSystem2DConstructor, Vector2, AudioNode2DAnalyserFFTSize } from "../typings";
+import { AudioNode2DConstructor, AudioNode2DControllerNodes, AudioNode2DControllerNodeName, AudioNode2DEvents, AudioSystem2DConstructor, Vector2, AudioNode2DAnalyserFFTSize, CompressorPresetsMap } from "../typings";
 import { RenderObject } from "./renderobject";
+export declare const AudioNode2DCompressorPresets: CompressorPresetsMap;
 export declare class AudioNode2D implements AudioNode2DConstructor {
     audioSystem: AudioSystem2D;
     audioSource: HTMLAudioElement;
@@ -9,6 +10,9 @@ export declare class AudioNode2D implements AudioNode2DConstructor {
     range: number;
     id: string;
     timestamp: number;
+    attachedRenderObject: RenderObject | null;
+    isAudible: boolean;
+    playWhenAudible: boolean;
     convolver: ConvolverNode;
     gainNode: GainNode;
     stereoPanner: StereoPannerNode;
@@ -90,7 +94,13 @@ export declare class AudioNode2D implements AudioNode2DConstructor {
      * @param pos Vector2 object
      */
     Position(pos?: Vec2 | Vector2): Vector2;
-    /** Plays the audio node with all effects set. */
+    /**
+     * Plays the audio node with all effects set.
+     *
+     * Does not play when property 'playWhenAudible' is set to true,
+     * because the AudioSystem2D connected to this node will automatically play
+     * the node when the listener is within the audio range.
+     **/
     Play(timestamp?: number): this | undefined;
     /** Resets all gain value to the original */
     ResetGain(): AudioNode2D;
@@ -212,6 +222,9 @@ export declare class AudioNode2D implements AudioNode2DConstructor {
      * Removes existing event listeners.
      */
     RemoveEventListener(event: AudioNode2DEvents): false | undefined;
+    AttachRenderObject(renderObject: RenderObject): void;
+    DetachRenderObject(): void;
+    Update(deltaTime: number): void;
 }
 export declare class AudioSystem2D implements AudioSystem2DConstructor {
     /** Don't play with this plz. */
@@ -291,7 +304,8 @@ export declare class AudioSystem2D implements AudioSystem2DConstructor {
     SetCompressorRatioValue(value: number): AudioSystem2D;
     SetCompressorReleaseValue(value: number): AudioSystem2D;
     SetCompressorThresholdValue(value: number): AudioSystem2D;
-    Update(): void;
+    UseCompressorPreset<K extends keyof CompressorPresetsMap>(preset: K): null | undefined;
+    Update(deltaTime: number): void;
     PauseAllNodes(): AudioSystem2D;
     AttachRenderObject(renderObject: RenderObject): AudioSystem2D;
 }

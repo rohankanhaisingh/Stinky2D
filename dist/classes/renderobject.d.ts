@@ -1,4 +1,5 @@
-import { Dimension2D, EasingName, RenderObjectConstructor, RenderObjectEventObject, RenderObjectEvents, RenderObjectStyleApplyingResults, RenderObjectStyles, SpritesheetControllerConstructor, Vector2 } from "../typings";
+import { Dimension2D, EasingName, RenderObjectConstructor, RenderObjectDataAttributes, RenderObjectEventMap, RenderObjectStyleApplyingResults, RenderObjectStyles, RenderObjectTransformProperty, SpritesheetControllerConstructor, Vector2 } from "../typings";
+import { AudioNode2D } from "./audio-system-2d";
 import { Renderer } from "./renderer";
 import { Scene } from "./scene";
 import { SpritesheetController } from "./spritesheet-controller";
@@ -9,8 +10,11 @@ export declare class RenderObject implements RenderObjectConstructor {
     timestamp: number;
     visible: boolean;
     forceRendering: boolean;
+    attributes: {
+        [K in RenderObjectDataAttributes]?: string;
+    };
     events: {
-        [key: string]: (event: RenderObjectEventObject) => void;
+        [key: string]: Function;
     };
     eventsOnce: {
         [key: string]: Function;
@@ -22,6 +26,8 @@ export declare class RenderObject implements RenderObjectConstructor {
         isDown: boolean;
         isUp: boolean;
     };
+    children: RenderObject[];
+    audioNodes: AudioNode2D[];
     x: number;
     y: number;
     width: number;
@@ -29,11 +35,13 @@ export declare class RenderObject implements RenderObjectConstructor {
     radius: number;
     segments: Vector2[];
     styles: RenderObjectStyles;
+    transform: number[] | null;
+    scaling: Vector2 | null;
     rotation: number;
     velocityX: number;
     velocityY: number;
-    gravitationalAcceleration: number;
-    objectWeight: number;
+    acceleration: number;
+    mass: number;
     scene: Scene;
     renderer: Renderer;
     initialPosition: Vector2;
@@ -42,6 +50,7 @@ export declare class RenderObject implements RenderObjectConstructor {
     constructor();
     Draw(ctx: CanvasRenderingContext2D): number;
     Update(ctx: CanvasRenderingContext2D, deltaTime: number): number;
+    OnAdd(renderer: Renderer): void;
     private _updateOnMouseOverEvent;
     UpdateEvents(): this | undefined;
     /**
@@ -123,7 +132,29 @@ export declare class RenderObject implements RenderObjectConstructor {
      * @param event
      * @param cb
      */
-    AddEventListener(event: RenderObjectEvents, cb: (event: RenderObjectEventObject) => void): RenderObject;
+    AddEventListener<K extends keyof RenderObjectEventMap>(event: K, cb: RenderObjectEventMap[K]): RenderObject;
+    /**
+     * Sets a data attribute to this instance, allowing every
+     * instance to be unique.
+     *
+     * @param attributeName Name of attribute.
+     * @param value Value of attribute, which has to be a string.
+     */
+    SetDataAttribute(attributeName: RenderObjectDataAttributes, value: string): RenderObject;
+    /**
+     * Returns a set attribute with its value. The value can be either
+     * a string or null if no attribute is set.
+     *
+     * @param attributeName Name of attribute.
+     * */
+    GetDataAttribute(attributeName: RenderObjectDataAttributes): string | null;
+    /**
+     * Sets a style property on this render object instance.
+     *
+     * @param style Key of the RenderObjectStyles interface.
+     * @param value Value of the style.
+    */
+    SetStyle(style: keyof RenderObjectStyles, value: any): any;
     /** Fuckinf fucky fuck fuck fuck */
     static ApplyRenderStyles(ctx: CanvasRenderingContext2D, styles: RenderObjectStyles): RenderObjectStyleApplyingResults;
     /**
@@ -135,4 +166,42 @@ export declare class RenderObject implements RenderObjectConstructor {
      * @param callback A function that will be called while animating, passing the animated value as argument.
     */
     static AnimateNumber(from: number, to: number, easing: EasingName, duration: number, callback: (value: number) => void): void;
+    /**
+     * Set the scaling on this render object using a
+     * Vector2 represented number object.
+     **/
+    SetScaling(scale: Vector2): RenderObject;
+    /**
+     * Set the scale x property on this render object.
+     * Or return the current set x scaling value of this object
+     * as a number.
+     * */
+    ScaleX(number?: number): number | null;
+    /**
+     * Set the scale y property on this render object.
+     * Or return the current set y scaling value of this object
+     * as a number.
+     * */
+    ScaleY(number?: number): number | null;
+    /** Disables scaling which may imrove the rendering performance. */
+    DisableScaling(): RenderObject;
+    /**
+     *  Enables scaling by setting the values for both x and y to 1 by default.
+     *
+     *  This method is optional to enable scaling. Scaling can also be enabled using
+     *  the following methods:
+     *
+     *  SetScaling(scalingObject);
+     *  ScaleX(scale);
+     *  ScaleY(scale);
+     */
+    EnableScaling(): RenderObject;
+    SetTransform(horizontalScaling: number, verticalSkewing: number, horizontalSkewing: number, verticalScaling: number, horizontalTranslation: number, verticalTranslation: number): RenderObject;
+    /**
+     * Gets a specific transform property and return its value.
+     *
+     * Will return null if the transform property does not contain valid values.
+     * */
+    GetTransformProperty(transformProperty: RenderObjectTransformProperty): number | null;
+    SetTransformProperty(transformProperty: RenderObjectTransformProperty, value: number): number[] | null;
 }

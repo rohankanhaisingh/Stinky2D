@@ -1,4 +1,18 @@
-import { Renderer, Scene, Camera, Looper, Rectangle, MouseMoveObject, RenderObjectEventObject, RandomIntBetween, WaitFor, RandomColor } from "../index";
+/**
+ * Events 
+ * by Rohan Kanhaisingh
+ * 
+ * -----------------------------------------------
+ * 
+ * This example demonstrates event listeners on
+ * graphical elements, for example a rectangle.
+ * 
+ * Each event listener has their own event object map
+ * including data about the event itself.
+ **/
+
+import { Renderer, Scene, Camera, Looper, Rectangle, RandomIntBetween, RandomColor } from "../index";
+import { RenderObjectMouseDownEvent, SceneResizeEventFunction } from "../typings";
 
 const scene = new Scene(innerWidth, innerHeight, document.querySelector(".app .container") as HTMLDivElement);
 const renderer = new Renderer(scene);
@@ -22,7 +36,6 @@ function updateDomElements() {
 	guiRenderDuration.innerText = "Render time: " + renderDuration.toString() + " ms";
 }
 
-
 async function createSquares() {
 
 	for (let i = 0; i < 322; i++) {
@@ -34,19 +47,22 @@ async function createSquares() {
 
 		square.Center(x, y);
 
-		square.AddEventListener("mouseEnter", function (event: RenderObjectEventObject) {
+		// Sets an event listener on the rectangle which gets triggered when the user enters the mouse in the object.
+		square.AddEventListener("mouseEnter", function (event) {
 
 			event.target.styles.shadowBlur = 10;
 			event.target.styles.shadowColor = event.target.styles.backgroundColor;
 		});
 
-		square.AddEventListener("mouseOut", function (event: RenderObjectEventObject) {
+		// Same happening, but when the user is leaving the mouse.
+		square.AddEventListener("mouseOut", function (event) {
 
 			event.target.styles.shadowBlur = 0;
 			event.target.styles.shadowColor = undefined;
 		});
 
-		square.AddEventListener("mouseDown", function (event: RenderObjectEventObject) {
+		// Yeah... It speaks for itself.
+		square.AddEventListener("mouseDown", function (event: RenderObjectMouseDownEvent) {
 
 			event.target.AnimateCurrentPosition({
 				x: RandomIntBetween(0, scene.width),
@@ -54,7 +70,9 @@ async function createSquares() {
 			}, "easeOutElastic", 2000);
 		});
 
-		square.AddEventListener("mouseWheel", function (event: RenderObjectEventObject) {
+
+		// And also this.
+		square.AddEventListener("mouseWheel", function (event) {
 
 			switch (event.mouse.wheelDirection) {
 				case "up":

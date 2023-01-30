@@ -1,4 +1,17 @@
 "use strict";
+/**
+ * Audio Effect Test
+ * by Rohan Kanhaisingh
+ *
+ * ---------------------------------
+ *
+ * This example demonstrates how you can change the audio
+ * post processing effects in a custom order which can take
+ * audible effect on the user.
+ *
+ * Both the AudioSystem2D and AudioNode2D classes are being used
+ * in this example.
+ */
 Object.defineProperty(exports, "__esModule", { value: true });
 const __1 = require("../");
 const audioSystem = new __1.AudioSystem2D();
@@ -12,7 +25,3 @@ audioNode.Reconnect([
     "GainNode",
     "AnalyserNode",
 ]).Play();
-audioNode.AddEventListener("update", function () {
-    const frequencyData = audioNode.GetAnalyserByteFrequencyData();
-    console.log(frequencyData);
-});

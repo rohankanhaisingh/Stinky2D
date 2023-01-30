@@ -18,6 +18,7 @@ class RenderObject {
         this.timestamp = Date.now();
         this.visible = true;
         this.forceRendering = false;
+        this.attributes = {};
         this.events = {};
         this.eventsOnce = {};
         this.eventStates = {
@@ -27,6 +28,10 @@ class RenderObject {
             isDown: false,
             isUp: false
         };
+        this.children = [];
+        this.audioNodes = [];
+        this.transform = null;
+        this.scaling = null;
         exports.AllExistingRenderObjects.push(this);
     }
     Draw(ctx) {
@@ -34,6 +39,9 @@ class RenderObject {
     }
     Update(ctx, deltaTime) {
         return 0;
+    }
+    OnAdd(renderer) {
+        return;
     }
     _updateOnMouseOverEvent() {
         const fixedMousePosition = this.scene.GetFixedMousePosition();
@@ -97,6 +105,13 @@ class RenderObject {
         if (typeof this.renderer.camera === "undefined")
             return;
         this._updateOnMouseOverEvent();
+        if (this.visible) {
+            if (typeof this.events["render"] === "function")
+                this.events["render"]({
+                    target: this,
+                    timestamp: Date.now()
+                });
+        }
     }
     /**
      * Centers the render object based on the object's dimensions and position.
@@ -383,6 +398,36 @@ class RenderObject {
         }
         return this;
     }
+    /**
+     * Sets a data attribute to this instance, allowing every
+     * instance to be unique.
+     *
+     * @param attributeName Name of attribute.
+     * @param value Value of attribute, which has to be a string.
+     */
+    SetDataAttribute(attributeName, value) {
+        this.attributes[attributeName] = value;
+        return this;
+    }
+    /**
+     * Returns a set attribute with its value. The value can be either
+     * a string or null if no attribute is set.
+     *
+     * @param attributeName Name of attribute.
+     * */
+    GetDataAttribute(attributeName) {
+        const foundAttribute = this.attributes[attributeName];
+        return typeof foundAttribute === "undefined" ? null : foundAttribute;
+    }
+    /**
+     * Sets a style property on this render object instance.
+     *
+     * @param style Key of the RenderObjectStyles interface.
+     * @param value Value of the style.
+    */
+    SetStyle(style, value) {
+        return this.styles[style] = value;
+    }
     // =============== Static methods ===============
     /** Fuckinf fucky fuck fuck fuck */
     static ApplyRenderStyles(ctx, styles) {
@@ -462,6 +507,109 @@ class RenderObject {
                 window.requestAnimationFrame(updateTick);
         };
         updateTick();
+    }
+    /**
+     * Set the scaling on this render object using a
+     * Vector2 represented number object.
+     **/
+    SetScaling(scale) {
+        this.scaling = scale;
+        return this;
+    }
+    /**
+     * Set the scale x property on this render object.
+     * Or return the current set x scaling value of this object
+     * as a number.
+     * */
+    ScaleX(number) {
+        if (typeof number === "number") {
+            if (this.scaling === null)
+                this.scaling = {
+                    x: 1,
+                    y: 1
+                };
+            this.scaling.x = number;
+            return this.scaling.x;
+        }
+        return this.scaling === null ? null : this.scaling.x;
+    }
+    /**
+     * Set the scale y property on this render object.
+     * Or return the current set y scaling value of this object
+     * as a number.
+     * */
+    ScaleY(number) {
+        if (typeof number === "number") {
+            if (this.scaling === null)
+                this.scaling = {
+                    x: 1,
+                    y: 1
+                };
+            this.scaling.y = number;
+            return this.scaling.y;
+        }
+        return this.scaling === null ? null : this.scaling.y;
+    }
+    /** Disables scaling which may imrove the rendering performance. */
+    DisableScaling() {
+        this.scaling = null;
+        return this;
+    }
+    /**
+     *  Enables scaling by setting the values for both x and y to 1 by default.
+     *
+     *  This method is optional to enable scaling. Scaling can also be enabled using
+     *  the following methods:
+     *
+     *  SetScaling(scalingObject);
+     *  ScaleX(scale);
+     *  ScaleY(scale);
+     */
+    EnableScaling() {
+        this.scaling = { x: 1, y: 1 };
+        return this;
+    }
+    SetTransform(horizontalScaling, verticalSkewing, horizontalSkewing, verticalScaling, horizontalTranslation, verticalTranslation) {
+        this.transform = [
+            horizontalScaling,
+            verticalSkewing,
+            horizontalSkewing,
+            verticalScaling,
+            horizontalTranslation,
+            verticalTranslation
+        ];
+        return this;
+    }
+    /**
+     * Gets a specific transform property and return its value.
+     *
+     * Will return null if the transform property does not contain valid values.
+     * */
+    GetTransformProperty(transformProperty) {
+        if (this.transform === null)
+            return null;
+        switch (transformProperty) {
+            case "hozirontalScaling": return this.transform[0];
+            case "verticalSkewing": return this.transform[1];
+            case "horizontalSkewing": return this.transform[2];
+            case "verticalScaling": return this.transform[3];
+            case "horizontalTranslation": return this.transform[4];
+            case "verticalTranslation": return this.transform[5];
+        }
+        return null;
+    }
+    SetTransformProperty(transformProperty, value) {
+        if (this.transform === null)
+            return null;
+        switch (transformProperty) {
+            case "hozirontalScaling": this.transform[0] = value;
+            case "verticalSkewing": this.transform[1] = value;
+            case "horizontalSkewing": this.transform[2] = value;
+            case "verticalScaling": this.transform[3] = value;
+            case "horizontalTranslation": this.transform[4] = value;
+            case "verticalTranslation": this.transform[5] = value;
+        }
+        return this.transform;
     }
 }
 exports.RenderObject = RenderObject;

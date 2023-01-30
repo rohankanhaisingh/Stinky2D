@@ -1,11 +1,12 @@
 import { AudioNode2D } from "./classes/audio-system-2d";
+import { GamepadController } from "./classes/controller";
 import { RenderObject } from "./classes/renderobject";
+import { Scene } from "./classes/scene";
 import { Vec2 } from "./functions/math";
 export type UniqueIDFilterKeywords = "numbers" | "letters" | "lettersUpperCase" | "lettersLowerCase";
 export type DragOffsetType = "center" | "offset";
 export type DragMouseButton = "left" | "middle" | "right";
 export type EasingName = "easeInQuad" | "easeOutQuad" | "easeInOutQuad" | "easeInCubic" | "easeOutCubic" | "easeInOutCubic" | "easeInQuart" | "easeOutQuart" | "easeInOutQuart" | "easeInQuint" | "easeOutQuint" | "easeInOutQuint" | "easeInSine" | "easeOutSine" | "easeInOutSine" | "easeInExpo" | "easeOutExpo" | "easeInOutExpo" | "easeInCirc" | "easeOutCirc" | "easeInOutCirc" | "easeInElastic" | "easeOutElastic" | "easeInOutElastic" | "easeInBack" | "easeOutBack" | "easeInOutBack" | "easeInBounce" | "easeOutBounce" | "easeInOutBounce";
-export type RenderObjectEvents = "mouseDown" | "mouseUp" | "mouseMove" | "mouseOut" | "mouseEnter" | "mouseClick" | "mouseWheel" | "render" | "update" | "exist" | "destroy";
 export type SceneAttributes = "keepSizeToWindow" | "disableContextMenu" | "redrawOnResize";
 export type SceneMouseWheelDirection = "up" | "down" | "left" | "right" | null;
 export type SceneEvents = "sceneResize" | "mouseDown" | "mouseUp" | "mouseMove" | "mouseOut" | "mouseEnter" | "mouseWheel";
@@ -17,6 +18,8 @@ export type AudioNode2DControllerNodes = BiquadFilterNode | StereoPannerNode | G
 export type AudioNode2DControllerNodeName = "BiquadFilter" | "StereoPanner" | "GainNode" | "AnalyserNode";
 export type AudioNode2DAnalyserFFTSize = 32 | 64 | 128 | 256 | 512 | 1024 | 2048 | 4096 | 8192 | 16384 | 32768;
 export type CollectionElementTypes = "string" | "number" | "bigint" | "boolean" | "symbol" | "undefined" | "object" | "function";
+export type RenderObjectDataAttributes = "data-id" | "data-name" | "data-behavior" | "data-timestamp" | "data-appearance";
+export type RenderObjectTransformProperty = "hozirontalScaling" | "verticalSkewing" | "horizontalSkewing" | "verticalScaling" | "horizontalTranslation" | "verticalTranslation";
 export interface GeneratedUniqueIDObject {
     readonly id: string;
     readonly timestamp: number;
@@ -242,11 +245,6 @@ export interface LineSystem2DConstructor {
     options: LineSystem2DOptions;
     lines: Line2DConstructor[];
 }
-export interface RenderObjectEventObject {
-    readonly target: RenderObject;
-    readonly mousePosition: Vector2;
-    readonly mouse: SceneMouseObject;
-}
 export interface Dimension2D {
     width?: number;
     height?: number;
@@ -302,6 +300,160 @@ export interface RigidBody2DConstructor {
     position: Vec2 | Vector2;
     velocity: Vec2 | Vector2;
     acceleration: Vec2 | Vector2;
+}
+export interface SceneResizeEventFunction {
+    readonly bruh: any;
+}
+export interface SceneMouseDownEvent {
+    readonly button: SceneMouseButtonsObject;
+    readonly timestamp: number;
+    readonly scene: Scene | SceneConstructor;
+}
+export interface SceneMouseUpEvent {
+    readonly button: SceneMouseButtonsObject;
+    readonly timestamp: number;
+    readonly scene: Scene | SceneConstructor;
+}
+export interface SceneMouseMoveEvent {
+    readonly timestamp: number;
+    readonly lastTimestamp: number;
+    readonly scene: Scene | SceneConstructor;
+    readonly x: number;
+    readonly y: number;
+    readonly velocityX: number;
+    readonly velocityY: number;
+}
+export interface SceneMouseOutEvent {
+    readonly timestamp: number;
+    readonly lastPosition: Vector2;
+    readonly isInWindow: boolean;
+    readonly scene: Scene | SceneConstructor;
+}
+export interface SceneMouseEnterEvent {
+    readonly timestamp: number;
+    readonly lastPosition: Vector2;
+    readonly isInWindow: boolean;
+    readonly scene: Scene | SceneConstructor;
+}
+export interface SceneMouseWheelEvent {
+    readonly direction: SceneMouseWheelDirection;
+    scene: Scene | SceneConstructor;
+    timestamp: number;
+}
+export interface SceneEventsMap {
+    "sceneResize": (ev: SceneResizeEventFunction) => void;
+    "mouseDown": (ev: SceneMouseDownEvent) => void;
+    "mouseUp": (ev: SceneMouseUpEvent) => void;
+    "mouseMove": (ev: SceneMouseMoveEvent) => void;
+    "mouseOut": (ev: SceneMouseOutEvent) => void;
+    "mouseEnter": (ev: SceneMouseEnterEvent) => void;
+    "mouseWheel": (ev: SceneMouseWheelEvent) => void;
+}
+export interface RenderObjectMouseDownEvent {
+    readonly target: RenderObject;
+    readonly mousePosition: Vector2;
+    readonly mouse: SceneMouseObject;
+}
+export interface RenderObjectMouseOutEvent {
+    readonly target: RenderObject;
+    readonly mousePosition: Vector2;
+    readonly mouse: SceneMouseObject;
+}
+export interface RenderObjectMouseEnterEvent {
+    readonly target: RenderObject;
+    readonly mousePosition: Vector2;
+    readonly mouse: SceneMouseObject;
+}
+export interface RenderObjectMouseWheelEvent {
+    readonly target: RenderObject;
+    readonly mousePosition: Vector2;
+    readonly mouse: SceneMouseObject;
+}
+export interface RenderObjectRenderEvent {
+    readonly target: RenderObject;
+    readonly timestamp: number;
+}
+export interface RenderObjectEventMap {
+    "mouseDown": (ev: RenderObjectMouseDownEvent) => void;
+    "mouseUp": Function;
+    "mouseMove": Function;
+    "mouseOut": (ev: RenderObjectMouseOutEvent) => void;
+    "mouseEnter": (ev: RenderObjectMouseEnterEvent) => void;
+    "mouseClick": Function;
+    "mouseWheel": (ev: RenderObjectMouseWheelEvent) => void;
+    "render": (ev: RenderObjectRenderEvent) => void;
+    "update": Function;
+    "exist": Function;
+    "destroy": Function;
+}
+export interface GamepadControllerConstructor {
+    id: string;
+    timestamp: number;
+    gamepad: Gamepad;
+    gamepadId: string;
+}
+export interface GamepadHandlerConstructor {
+    id: string;
+    timestamp: number;
+    events: {
+        [K: string]: Function;
+    };
+}
+export interface GamepadHandlerConnectEvent {
+    gamepad: GamepadController;
+    timestamp: number;
+    id: string;
+}
+export interface GamepadHandlerEventMap {
+    "connect": (ev: GamepadHandlerConnectEvent) => void;
+    "disconnect": Function;
+}
+export interface GamepadControllerUpdateEvent {
+    timestamp: number;
+}
+export interface GamepadControllerEventMap {
+    "update": (ev: GamepadControllerUpdateEvent) => void;
+}
+export interface GamepadControllerUniversalDirectionalButtons {
+    top: boolean;
+    left: boolean;
+    right: boolean;
+    bottom: boolean;
+}
+export interface PS4DualShockRightButtonsMap {
+    triangle: boolean;
+    circle: boolean;
+    cross: boolean;
+    square: boolean;
+}
+export interface PS4DualShockMap {
+    leftHandedButtons: GamepadControllerUniversalDirectionalButtons;
+    rightHandedButtons: PS4DualShockRightButtonsMap;
+    leftHandedJoystick: Vector2;
+    rightHandedJoystick: Vector2;
+    leftHandedJoystickButton: boolean;
+    rightHandedJoystickButton: boolean;
+    playStationButton: boolean;
+    shareButton: boolean;
+    optionsButton: boolean;
+    touchPadButton: boolean;
+    leftHandedBacksideDigitalButton: number;
+    leftHandedBacksideButton: boolean;
+    rightHandedBacksideDigitalButton: number;
+    rightHandedBacksideButton: boolean;
+}
+export interface GamepadControllerTypeMap {
+    "ps4-dual-shock": PS4DualShockMap;
+}
+export interface CompressorPreset {
+    threshold: number;
+    knee: number;
+    ratio: number;
+    attack: number;
+    release: number;
+}
+export interface CompressorPresetsMap {
+    "master-no-clip": CompressorPreset;
 }
 declare global {
     interface Window {

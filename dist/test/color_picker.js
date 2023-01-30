@@ -1,4 +1,14 @@
 "use strict";
+/*
+ * Color Picker
+ * by Rohan Kanhaisingh
+ *
+ * ---------------------
+ *
+ * This example demonstrates how you can pick colors on a specific
+ * pixel or pixels using the renderer.GetImageData() method.
+ *
+ */
 Object.defineProperty(exports, "__esModule", { value: true });
 const __1 = require("..");
 const scene = new __1.Scene(innerWidth, innerHeight, document.querySelector(".app .container"));
@@ -30,7 +40,9 @@ for (let i = 0; i < 42; i++) {
     });
     renderer.Add(rect);
 }
+// Sets an event listener when the user moves their mouse on the scene.
 scene.AddEventListener("mouseMove", function (event) {
+    // Simplifying collected image data from the renderer.
     const imageData = (0, __1.SimplifyImageData)(renderer.GetImageData(event.x, event.y, 1, 1));
     console.log(imageData.hex);
     //if (colors[0] !== 235 && colors[1] !== 74 && colors[2] !== 98) {

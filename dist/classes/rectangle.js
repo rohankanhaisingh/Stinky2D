@@ -46,6 +46,13 @@ class Rectangle extends renderobject_1.RenderObject {
     Draw(ctx) {
         ctx.save();
         ctx.translate(this.x + (this.width / 2), this.y + (this.height / 2));
+        if (this.scaling !== null)
+            ctx.scale(this.scaling.x, this.scaling.y);
+        if (this.transform !== null) {
+            if (this.transform.length !== 6)
+                throw new Error("Failed to set transformation on object since property does not contain valid values.");
+            ctx.transform(this.transform[0], this.transform[1], this.transform[2], this.transform[3], this.transform[4], this.transform[5]);
+        }
         ctx.rotate(this.rotation * Math.PI / 180);
         ctx.beginPath();
         renderobject_1.RenderObject.ApplyRenderStyles(ctx, this.styles);

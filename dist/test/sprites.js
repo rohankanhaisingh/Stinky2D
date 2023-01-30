@@ -52,9 +52,6 @@ function createQuestionButton(x, y, textures) {
         event.target.styles.shadowOffsetX = 0;
         event.target.styles.shadowOffsetY = 0;
     });
-    rect.AddEventListener("mouseDown", function (event) {
-        (0, index_1.AnimateInteger)(0, 360, "easeOutElastic", 3000, rotation => event.target.rotation = rotation);
-    });
     const spritesheetController = new index_1.SpritesheetController(textures, rect);
     spritesheetController.duration = 800;
     spritesheetController.loop = true;

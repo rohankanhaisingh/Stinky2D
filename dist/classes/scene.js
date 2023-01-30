@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Scene = void 0;
+const math_1 = require("../functions/math");
 const uid_1 = require("../functions/uid");
 function createMouseObject() {
     return {
@@ -194,7 +195,8 @@ class Scene {
         return this.attributes;
     }
     /**
-     * Exports the canvas element to an image.
+     * Exports the canvas element to an image using a specific
+     * image format. The recommended image format is "png".
      *
      * Will return ``null`` if the given format is unknown.
      * @param format
@@ -220,7 +222,8 @@ class Scene {
         return this;
     }
     /**
-     * Removes an existing event listener.
+     * Removes an existing event listener, returning a boolean describing
+     * the state of the removal.
      *
      * @param event
      */
@@ -230,6 +233,12 @@ class Scene {
         delete this.events[event];
         return true;
     }
+    /**
+     * Calculates the fixed mouse position based on the applied camera position
+     * and the mouse position, returning a Vector2 typeof object.
+     *
+     * Note that if no camera has been applied, the normal mouse position will be returned.
+     */
     GetFixedMousePosition() {
         if (!this.camera)
             return {
@@ -240,6 +249,17 @@ class Scene {
             x: (this.mouse.x - this.camera.x) / this.camera.scaleX,
             y: (this.mouse.y - this.camera.y) / this.camera.scaleY,
         };
+    }
+    /**
+     * Calculates the center coordinate of the canvas element
+     * and returns a Vec2 class instance containing the calculated values.
+     *
+     * Requires no arguments.
+     */
+    Center() {
+        const x = this.canvasElement.width / 2;
+        const y = this.canvasElement.height / 2;
+        return new math_1.Vec2(x, y);
     }
 }
 exports.Scene = Scene;
