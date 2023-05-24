@@ -1,9 +1,10 @@
 # Scene
 
-Creating a ``Scene`` class instance will initialize the entire drawing process, 
-creating a [``HTMLCanvasElement``](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement) instance.
+Creates a scene in which allow you what and where you want things to be 
+rendered. 
 
-This is a required component in the program. Without this instance, no graphics will and can be shown.
+This is NOT the place where you add graphical elements.
+You can add cameras though.
 
 - - - 
 
@@ -13,89 +14,91 @@ This is a required component in the program. Without this instance, no graphics 
 new Scene(width: number, height: number, domElement: HTMLElement, attributes?: SceneAttributes[]);
 ```
 
-| Argument name  | Type              | Required | Description                                                                 |
-|----------------|-------------------|----------|-----------------------------------------------------------------------------|
-| ``width``      | Number            | yes      | Sets the width of the scene.                                                |
-| ``height``     | Number            | yes      | Sets the height of the scene.                                               |
-| ``domElement`` | HTMLElement       | yes      | A HTMLElement in which the canvas element of the scene will be appended in. |
-| ``attributes`` | SceneAttributes[] | no       | Attributes that will set the behaviour of the scene.                        |
+| Argument name   | Type             | Required | Description                                              |
+|-----------------|------------------|----------|----------------------------------------------------------|
+| ``width``       | Number           | Yes      | The width of the scene.                                  |
+| ``height``      | Number           | Yes      | The height of the scene.                                 |
+| ``domElement``  | HTMLElement      | Yes      | The element in which the canvas element will be appended |
+| ``attributes``  | SceneAttributes[]| No       | Attributes and things you know.                          |
 
 ## Class properties
 
-| Property name     | Type                                                    | Description                                                                 |
-|-------------------|---------------------------------------------------------|-----------------------------------------------------------------------------|
-| ``width``         | Number                                                  | Sets the width of the scene.                                                |
-| ``height``        | Number                                                  | Sets the height of the scene.                                               |
-| ``domElement``    | HTMLElement                                             | A HTMLElement in which the canvas element of the scene will be appended in. |
-| ``canvasElement`` | HTMLCanvasElement                                       | Canvas element that will be created.                                        |
-| ``id``            | String                                                  | Unique generated id for this instance.                                      |
-| ``events``        | ``{[key: string]: Function}``                           | Object with event functions.                                                |
-| ``attributes``    | ``SceneAttributes[]``                                   | Attributes that will set the behaviour of the scene.                        |
-| ``mouse``         | [``SceneMouseObject``](../typedefs/SceneMouseObject.md) | Object containing properties and methods being controlled by the mouse.     |
-| ``camera``        | [``Camera``](./Camera.md)                               | Camera instance that will be applied later.                                 |
-| ``renderer``      | [``Renderer``](./Renderer.md)                           | Renderer instance that will be applied later.                               |
+| Property name     | Type              | Description                                         | Access type   |
+|-------------------|-------------------|-----------------------------------------------------|---------------|
+| ``width``         | Number            | The width of the scene                              | ``Changable`` |
+| ``height``        | Number            | The height of the scene                             | ``Changable`` |
+| ``domElement``    | HTMLElement       | Element in which the canvas element gets appened in | ``Readonly``  |
+| ``canvasElement`` | HTMLCanvasElement | Canvas element in where things will get painted     | ``Readonly``  |
+| ``events``        | Unknown           | Object containing event functions                   | ``Readonly``  |
+| ``mouse``         | SceneMouseObject  | Object containing info about the user mouse         | ``Readonly``  |
+| ``camera``        | Camera            | Camera instance                                     | ``Readonly``  |
+| ``renderer``      | Renderer          | Renderer instance                                   | ``Readonly``  |
 
 ## Methods
 
-### SetAttribute()
+### ``SetPosition()``
 
 Sets an attribute to this instance, which will have impact on certain behaviors. 
 
-| Argument name |                            Type                      | Required |
-|---------------|------------------------------------------------------|----------|
-| ``attribute`` | [``SceneAttributes``](../typedefs/SceneAttribute.md) | Yes      |
+```ts
+public SetAttribute(attribute: SceneAttributes): SceneAttributes[];
+```
 
-### RemoveAttribute()
+### ``RemoveAttribute()``
 
-Removes an existing attribute of this instance.
-
-| Argument name |                            Type                      | Required |
-|---------------|------------------------------------------------------|----------|
-| ``attribute`` | [``SceneAttributes``](../typedefs/SceneAttribute.md) | Yes      |
-
-### ExportToImage()
-
-Exports the canvas element to an image.
-Will return ``null`` if the given format is unknown.
-
-| Argument name |                          Type                           | Required |
-|---------------|---------------------------------------------------------|----------|
-| ``format``    | [``SceneImageFormat``](../typedefs/SceneImageFormat.md) | Yes      |
-
-### AddEventListener()
-
- Appends an event listener which will be evoked when any of these event gets triggered. 
- When an event listener already exists, an error will be returned.
-
-| Argument name | Type                                          | Required |
-|---------------|-----------------------------------------------|----------|
-| ``event``     | [``SceneEvents``](../typedefs/SceneEvents.md) | Yes      |
-| ``cb``        | Function                                      | Yes      |
-
-### RemoveEventListener()
-
-Removes an existing event listener.
-
-| Argument name | Type                                          | Required |
-|---------------|-----------------------------------------------|----------|
-| ``event``     | [``SceneEvents``](../typedefs/SceneEvents.md) | Yes      |
-
-### GetFixedMousePosition()
-
-Returns an object with the calculated mouse position based on the camera position.
-
-Returns a [``Vector2``](../typedefs/Vector2.md) object.
-
-## Examples
-
-### Example 1
+Removes an existing attribute from this instance.
 
 ```ts
-import { Scene } from "stinky-2d";
+public RemoveAttribute(attribute: SceneAttributes): SceneAttributes[];
+```
 
-const myScene = new Scene(innerWidth, innerHeight, document.body);
+### ``ExportToImage()``
 
-myScene.SetAttribute("keepSizeToWindow");
-myScene.SetAttribute("disableContextMenu");
-myScene.SetAttribute("redrawOnResize");
+Exports the canvas element to an image using a specific
+image format. The recommended image format is "png".
+	  
+Will return ``null`` if the given format is unknown.
+
+```ts
+public ExportToImage(format: SceneImageFormat): null | string;
+```
+
+### ``AddEventListener()``
+
+Appends an event listener which will be evoked when any of these event gets triggered. 
+	  
+When an event listener already exists, an error will be returned.
+
+```ts
+public AddEventListener<K extends keyof SceneEventsMap>(event: K, cb: SceneEventsMap[K]): Scene;
+```
+
+### ``RemoveEventListener()``
+
+Removes an existing event listener, returning a boolean describing
+the state of the removal.
+
+```ts
+public RemoveEventListener<K extends keyof SceneEventsMap>(event: K): boolean ;
+```
+
+### ``GetFixedMousePosition()``
+
+Calculates the fixed mouse position based on the applied camera position
+and the mouse position, returning a Vector2 typeof object.
+	  
+Note that if no camera has been applied, the normal mouse position will be returned.
+
+```ts
+public GetFixedMousePosition(): Vector2;
+```
+
+### ``Center()``
+
+Calculates the center coordinate of the canvas element
+and returns a Vec2 class instance containing the calculated values.
+	  
+Requires no arguments.
+```ts
+public Center(): Vec2;
 ```

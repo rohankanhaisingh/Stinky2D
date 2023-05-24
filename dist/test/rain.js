@@ -17,6 +17,7 @@ const scene = new index_1.Scene(innerWidth, innerHeight, document.querySelector(
 const renderer = new index_1.Renderer(scene);
 const camera = new index_1.Camera(renderer, scene);
 const looper = new index_1.Looper();
+const offscreenRenderer = new index_1.OffscreenRenderer();
 //@ts-expect-error
 window["renderer"] = renderer;
 scene.SetAttribute("keepSizeToWindow");
@@ -54,8 +55,6 @@ function createLightning(x) {
         const lineSystem = new index_1.LineSystem2D(0, 0);
         const lineStyles = {
             strokeColor: index_1.ColorCodes.WHITE,
-            shadowBlur: 10,
-            shadowColor: index_1.ColorCodes.WHITE,
             lineWidth: lineWidth,
             lineCap: "round"
         };
@@ -110,6 +109,8 @@ function createLightningLoop() {
 }
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
+        offscreenRenderer.SetDynamicScalingFactor(renderer, 1);
+        //offscreenRenderer.UseGlowEffect(25, 3);
         createLightningLoop();
         createRainFall(350);
         scene.AddEventListener("mouseDown", function () {
@@ -128,6 +129,8 @@ function main() {
             renderDuration = renderer.RenderObjectsInCamera(event.deltaTime).duration;
             updateRainDroplets(event.deltaTime);
             updateDomElements();
+            offscreenRenderer.CreateTexture(renderer);
+            renderer.RenderCopiedTexture(offscreenRenderer, { opacity: 1 });
         });
         looper.Trigger();
     });

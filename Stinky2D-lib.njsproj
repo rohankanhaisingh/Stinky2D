@@ -32,7 +32,11 @@
   <ItemGroup>
     <Content Include=".gitignore" />
     <Content Include="docs\classes\AudioNode2D.md" />
+    <Content Include="docs\classes\Camera.md" />
+    <Content Include="docs\classes\Looper.md" />
+    <Content Include="docs\classes\Renderer.md" />
     <Content Include="docs\classes\Scene.md" />
+    <Content Include="docs\functions\Math.md" />
     <Content Include="docs\typedefs\AtanCalculation.md" />
     <Content Include="docs\typedefs\DragMouseButton.md" />
     <Content Include="docs\typedefs\DragOffsetType.md" />
@@ -50,17 +54,20 @@
     <Content Include="docs\typedefs\SceneMouseWheelDirection.md" />
     <Content Include="docs\typedefs\UniqueIDFilteringKeywords.md" />
     <Content Include="docs\typedefs\Vector2.md" />
+    <Content Include="package.json" />
+    <Content Include="README.md" />
     <Content Include="src\segments\spacerock01.json" />
     <Content Include="src\shaders\cube.wgsl" />
     <Content Include="src\shaders\cube_lite.gs" />
+    <Content Include="src\shaders\test\fragment.glsl" />
+    <Content Include="src\shaders\test\vertex.glsl" />
     <Content Include="src\tsconfig.json" />
-    <Content Include="package.json" />
-    <Content Include="README.md" />
     <Content Include="tsconfig.json" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="docs\" />
     <Folder Include="docs\classes\" />
+    <Folder Include="docs\functions\" />
     <Folder Include="docs\typedefs\" />
     <Folder Include="src\" />
     <Folder Include="src\classes\" />
@@ -68,6 +75,7 @@
     <Folder Include="src\functions\" />
     <Folder Include="src\segments\" />
     <Folder Include="src\shaders\" />
+    <Folder Include="src\shaders\test\" />
     <Folder Include="src\test\" />
   </ItemGroup>
   <ItemGroup>
@@ -79,6 +87,7 @@
     <TypeScriptCompile Include="src\classes\geometry-2d.ts" />
     <TypeScriptCompile Include="src\classes\linesystem.ts" />
     <TypeScriptCompile Include="src\classes\looper.ts" />
+    <TypeScriptCompile Include="src\classes\offscreen-renderer.ts" />
     <TypeScriptCompile Include="src\classes\physics-2d.ts" />
     <TypeScriptCompile Include="src\classes\plugins.ts" />
     <TypeScriptCompile Include="src\classes\rectangle.ts" />
@@ -94,6 +103,7 @@
     <TypeScriptCompile Include="src\functions\uid.ts" />
     <TypeScriptCompile Include="src\functions\utilities.ts" />
     <TypeScriptCompile Include="src\index.ts" />
+    <TypeScriptCompile Include="src\test\3d-test.ts" />
     <TypeScriptCompile Include="src\test\animated_tiles.ts" />
     <TypeScriptCompile Include="src\test\audio-effect-test.ts" />
     <TypeScriptCompile Include="src\test\audio-test.ts" />
@@ -103,11 +113,12 @@
     <TypeScriptCompile Include="src\test\events.ts" />
     <TypeScriptCompile Include="src\test\fireworks.ts" />
     <TypeScriptCompile Include="src\test\moving_audio_source.ts" />
-    <TypeScriptCompile Include="src\test\physics_test.ts" />
+    <TypeScriptCompile Include="src\test\physic_test.ts" />
     <TypeScriptCompile Include="src\test\ping_pong.ts" />
     <TypeScriptCompile Include="src\test\plugin_test.ts" />
     <TypeScriptCompile Include="src\test\post_processor.ts" />
     <TypeScriptCompile Include="src\test\rain.ts" />
+    <TypeScriptCompile Include="src\test\single_rendering.ts" />
     <TypeScriptCompile Include="src\test\sprites.ts" />
     <TypeScriptCompile Include="src\test\transformation.ts" />
     <TypeScriptCompile Include="src\test\tutorial.ts" />

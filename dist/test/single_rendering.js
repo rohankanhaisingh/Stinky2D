@@ -14,7 +14,6 @@ const scene = new __1.Scene(innerWidth, innerHeight, document.querySelector(".ap
 const renderer = new __1.Renderer(scene, { willReadFrequently: true });
 const camera = new __1.Camera(renderer, scene);
 const looper = new __1.Looper();
-const offscreenRenderer = new __1.OffscreenRenderer();
 function updateDomElements() {
     const guiFramerate = document.querySelector("#game-framerate");
     const guiDeltatime = document.querySelector("#game-deltatime");
@@ -25,31 +24,20 @@ function updateDomElements() {
     guiDeltatime.innerText = "Delta time: " + looper.deltaTime.toFixed(2) + "ms";
     guiRenderObjects.innerText = "Render objects: " + renderer.renderObjects.length.toString();
     guiVisibleRenderObjects.innerText = "Visible render objects: " + renderer.visibleRenderObjects.length.toString();
-    guiRenderDuration.innerText = "Render time:  ?ms";
+    guiRenderDuration.innerText = "Render time: 0ms";
 }
-function render(event) {
-    const renderingOptions = {
-        opacity: 1,
-        imageSmoothingEnabled: true
-    };
-    renderer.ClearScene();
-    renderer.PaintScene(__1.ColorCodes.BLACK);
-    renderer.RenderObjectsInCamera(event.deltaTime).duration;
+const obj1 = new __1.Rectangle(140, 140, 40, 40, {
+    backgroundColor: "red"
+});
+const obj2 = new __1.Rectangle(340, 340, 40, 40, {
+    backgroundColor: "green"
+});
+function render() {
+    renderer.Render(obj2, looper.deltaTime);
     updateDomElements();
-    offscreenRenderer.CreateTexture(renderer);
-    renderer.RenderCopiedTexture(offscreenRenderer, renderingOptions);
 }
 function setup() {
     return __awaiter(this, void 0, void 0, function* () {
-        offscreenRenderer.SetDynamicScalingFactor(renderer, .5);
-        for (let i = 0; i < 100; i++) {
-            const x = (0, __1.RandomIntBetween)(0, scene.width);
-            const y = (0, __1.RandomIntBetween)(0, scene.height);
-            const circle = new __1.Circle(x, y, 10, 0, 360, false, {
-                backgroundColor: (0, __1.RandomColor)()
-            });
-            renderer.Add(circle);
-        }
         looper.Trigger();
     });
 }

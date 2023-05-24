@@ -27,6 +27,7 @@ const scene = new __1.Scene(innerWidth, innerHeight, document.querySelector(".ap
 const renderer = new __1.Renderer(scene, { willReadFrequently: true });
 const camera = new __1.Camera(renderer, scene);
 const looper = new __1.Looper();
+const postProcessor = new __1.OffscreenRenderer();
 /**
  * Function that generates tile
  * */
@@ -36,29 +37,29 @@ function createTiles(widthInPixels, heightInPixels, tileSize, gap, delay) {
         // And rounding it up, cuz yeah fuck not rounded number.
         const tileWidth = Math.round(widthInPixels / tileSize) + 1;
         const tileHeight = Math.round(heightInPixels / tileSize) + 1;
+        const baseXShade = (0, __1.RandomIntBetween)(0, 255);
+        const baseYShade = (0, __1.RandomIntBetween)(0, 255);
         // Do the loopy loop loop.
         for (let x = 0; x < tileWidth; x += 1) {
             // Calculated the horizontal color shade.
-            const shadeX = 255 / tileWidth * x;
+            const shadeX = baseXShade / tileWidth * x;
             // Some other loops.
             for (let y = 0; y < tileHeight; y++) {
                 // Calculated the vertical color shade.
-                const shadeY = 145 / tileHeight * y;
+                const shadeY = baseYShade / tileHeight * y;
                 // Converting an array containing byte values to a heximal string value.
                 const calculatedHexColor = "#" + (0, __1.ConvertByteArrayToHex)([shadeX, 142, shadeY]);
                 const hoverColor = "#ffffff";
                 // Yeah the rest speaks for itself.
                 const tile = new __1.Rectangle(x * (tileSize + gap), y * (tileSize + gap), tileSize, tileSize, {
-                    backgroundColor: calculatedHexColor,
-                    shadowBlur: 60,
-                    shadowColor: calculatedHexColor
+                    backgroundColor: calculatedHexColor
                 });
                 tile.AddEventListener("mouseDown", function () {
                     (0, __1.AnimateHeximalColor)(hoverColor, calculatedHexColor, "easeOutCirc", 1000, color => tile.SetStyle("backgroundColor", color));
                     (0, __1.AnimateHeximalColor)(hoverColor, calculatedHexColor, "easeOutCirc", 1000, color => tile.SetStyle("shadowColor", color));
                 });
                 renderer.Add(tile);
-                (0, __1.AnimateInteger)(0, 1, "easeOutExpo", 1000, opacity => tile.SetStyle("opacity", opacity));
+                // AnimateInteger(0, 1, "easeOutExpo", 1000, opacity => tile.SetStyle("opacity", opacity));
                 if (delay !== 0)
                     yield (0, __1.WaitFor)(delay);
             }
@@ -81,14 +82,18 @@ function updateDomElements() {
 function render(event) {
     renderer.ClearScene();
     renderer.PaintScene(__1.ColorCodes.BLACK);
-    renderDuration = renderer.RenderObjectsInCamera(event.deltaTime).duration;
+    renderDuration = renderer.RenderObjectsInCamera(0).duration;
+    postProcessor.CreateTexture(renderer);
+    renderer.RenderCopiedTexture(postProcessor, { opacity: 0.5 });
     updateDomElements();
 }
 function setup() {
     return __awaiter(this, void 0, void 0, function* () {
+        postProcessor.SetDynamicScalingFactor(renderer, .2);
+        postProcessor.UseGlowEffect(5, 2);
         looper.Trigger();
         createTiles(600, 600, 50, 20, 0);
+        render(null);
     });
 }
-looper.AddEventListener("update", render);
 window.addEventListener("load", setup);

@@ -1,10 +1,23 @@
-import { Renderer, Scene, Looper, Camera, ColorCodes, Rectangle, LoadImageSync, OffscreenRenderer, Circle, RandomIntBetween, RandomColor, CopyRenderingOptions } from "..";
+
+import { Renderer, Scene, Looper, Camera, ColorCodes,LooperTickState, PhysicsWorld2D, Rectangle, RigidBody2D } from "..";
 
 const scene: Scene = new Scene(innerWidth, innerHeight, document.querySelector(".app .container") as HTMLDivElement, ["redrawOnResize", "keepSizeToWindow", "disableContextMenu"]);
 const renderer: Renderer = new Renderer(scene, { willReadFrequently: true });
 const camera: Camera = new Camera(renderer, scene);
 const looper: Looper = new Looper();
-const offscreenRenderer: OffscreenRenderer = new OffscreenRenderer();
+
+const world: PhysicsWorld2D = new PhysicsWorld2D();
+
+const ground = new Rectangle((innerWidth / 2) - 200, innerHeight - 300, 400, 40, { backgroundColor: ColorCodes.BLACKBERRY });
+const fallingObject = new Rectangle(innerWidth / 2, 120, 50, 50, { backgroundColor: ColorCodes.GABLE_GREEN });
+
+const groundRigidBody: RigidBody2D = new RigidBody2D(ground, 0, true);
+const fallingObjectRigidBody: RigidBody2D = new RigidBody2D(fallingObject, 5, false);
+
+world.AddRigidBody(groundRigidBody).AddRigidBody(fallingObjectRigidBody);
+
+renderer.Add(ground);
+renderer.Add(fallingObject);
 
 function updateDomElements() {
 
@@ -18,44 +31,26 @@ function updateDomElements() {
 	guiDeltatime.innerText = "Delta time: " + looper.deltaTime.toFixed(2) + "ms";
 	guiRenderObjects.innerText = "Render objects: " + renderer.renderObjects.length.toString();
 	guiVisibleRenderObjects.innerText = "Visible render objects: " + renderer.visibleRenderObjects.length.toString();
-	guiRenderDuration.innerText = "Render time:  ?ms";
+	guiRenderDuration.innerText = "Render time: 0ms";
 }
+function render(event: LooperTickState) {
 
-function render(event: any) {
-
-	const renderingOptions: CopyRenderingOptions = {
-		opacity: 1,
-		imageSmoothingEnabled: true
-	};
+	if (event.deltaTime < 0) return;
 
 	renderer.ClearScene();
-	renderer.PaintScene(ColorCodes.BLACK);
-	renderer.RenderObjectsInCamera(event.deltaTime).duration;
+	renderer.PaintScene(ColorCodes.WHITE);
+
+	renderer.RenderObjectsInCamera(event.deltaTime);
+	world.Update(event.deltaTime);
 
 	updateDomElements();
-
-	offscreenRenderer.CreateTexture(renderer);
-	renderer.RenderCopiedTexture(offscreenRenderer, renderingOptions);
 }
 
+
 async function setup() {
-
-	offscreenRenderer.SetDynamicScalingFactor(renderer, .5);
-
-	for (let i = 0; i < 100; i++) {
-
-		const x = RandomIntBetween(0, scene.width);
-		const y = RandomIntBetween(0, scene.height);
-
-		const circle = new Circle(x, y, 10, 0, 360, false, {
-			backgroundColor: RandomColor()
-		});
-
-		renderer.Add(circle);
-	}
 
 	looper.Trigger();
 }
 
 looper.AddEventListener("update", render);
-window.addEventListener("load", setup);
+window.addEventListener("load", setup)

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AnimateInteger = exports.Vec3 = exports.Vec2 = exports.GetAverageArrayValue = exports.CalculateIntersection = exports.CalculateDistance = exports.CalculateAtan = exports.CalculateAngle = exports.RandomIntBetween = exports.LoadAudioSync = exports.SimplifyImageData = exports.LoadImageSync = exports.WaitFor = exports.Easings = exports.UniqueID = exports.FixedHexToRgbArray = exports.AnimateHeximalColor = exports.ConvertByteArrayToHex = exports.ConvertHexToByteArray = exports.RandomColor = exports.ColorCodes = exports.GamepadHandler = exports.GamepadController = exports.Plugins = exports.RigidBody2D = exports.Collection = exports.AudioNode2D = exports.AudioSystem2D = exports.SpritesheetController = exports.LineSystem2D = exports.Line2D = exports.Geometry2D = exports.Circle = exports.TextNode = exports.Rectangle = exports.Looper = exports.Camera = exports.Renderer = exports.AllExistingRenderObjects = exports.RenderObject = exports.Scene = void 0;
+exports.AnimateInteger = exports.Vec3 = exports.Vec2 = exports.GetAverageArrayValue = exports.CalculateIntersection = exports.CalculateDistance = exports.CalculateAtan = exports.CalculateAngle = exports.RandomIntBetween = exports.LoadAudioSync = exports.SimplifyImageData = exports.LoadImageSync = exports.WaitFor = exports.Easings = exports.UniqueID = exports.FixedHexToRgbArray = exports.AnimateHeximalColor = exports.ConvertByteArrayToHex = exports.ConvertHexToByteArray = exports.RandomColor = exports.ColorCodes = exports.OffscreenRenderer = exports.GamepadHandler = exports.GamepadController = exports.Plugins = exports.PhysicsWorld2D = exports.RigidBody2D = exports.Collection = exports.AudioNode2D = exports.AudioSystem2D = exports.SpritesheetController = exports.LineSystem2D = exports.Line2D = exports.Geometry2D = exports.Circle = exports.TextNode = exports.Rectangle = exports.Looper = exports.Camera = exports.Renderer = exports.AllExistingRenderObjects = exports.RenderObject = exports.Scene = void 0;
 /**
  * Stinky2D library
  *
@@ -36,11 +36,14 @@ var collection_1 = require("./classes/collection");
 Object.defineProperty(exports, "Collection", { enumerable: true, get: function () { return collection_1.Collection; } });
 var physics_2d_1 = require("./classes/physics-2d");
 Object.defineProperty(exports, "RigidBody2D", { enumerable: true, get: function () { return physics_2d_1.RigidBody2D; } });
+Object.defineProperty(exports, "PhysicsWorld2D", { enumerable: true, get: function () { return physics_2d_1.PhysicsWorld2D; } });
 var plugins_1 = require("./classes/plugins");
 Object.defineProperty(exports, "Plugins", { enumerable: true, get: function () { return plugins_1.Plugins; } });
 var controller_1 = require("./classes/controller");
 Object.defineProperty(exports, "GamepadController", { enumerable: true, get: function () { return controller_1.GamepadController; } });
 Object.defineProperty(exports, "GamepadHandler", { enumerable: true, get: function () { return controller_1.GamepadHandler; } });
+var offscreen_renderer_1 = require("./classes/offscreen-renderer");
+Object.defineProperty(exports, "OffscreenRenderer", { enumerable: true, get: function () { return offscreen_renderer_1.OffscreenRenderer; } });
 var colors_1 = require("./constants/colors");
 Object.defineProperty(exports, "ColorCodes", { enumerable: true, get: function () { return colors_1.ColorCodes; } });
 Object.defineProperty(exports, "RandomColor", { enumerable: true, get: function () { return colors_1.RandomColor; } });

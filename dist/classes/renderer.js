@@ -4,6 +4,7 @@ exports.Renderer = void 0;
 const uid_1 = require("../functions/uid");
 const camera_1 = require("./camera");
 const collection_1 = require("./collection");
+const offscreen_renderer_1 = require("./offscreen-renderer");
 class Renderer {
     /**
      * By creating a 'renderer' instance, the program can draw images.
@@ -55,7 +56,7 @@ class Renderer {
         return this;
     }
     /** Render all objects in conjunction with the camera linked to this instance */
-    RenderObjectsInCamera(deltaTime) {
+    RenderObjectsInCamera(deltaTime, renderMode) {
         if (!(this.camera instanceof camera_1.Camera))
             throw new Error("Cannot render objects in camera since no camera has been specified.");
         const results = {
@@ -69,7 +70,7 @@ class Renderer {
         const visibleObjects = [];
         ctx.save();
         if (this.transform !== null)
-            ctx.transform(this.transform.horizontalScaling, this.transform.verticalSkewing, this.transform.horizontalSkewing, this.transform.verticalScaling, this.transform.horizontalTranslation, this.transform.verticalTranslation);
+            ctx.transform(this.transform[0], this.transform[1], this.transform[2], this.transform[3], this.transform[4], this.transform[5]);
         ctx.translate(camera.x, camera.y);
         ctx.scale(camera.scaleX, camera.scaleY);
         let i = 0;
@@ -156,12 +157,120 @@ class Renderer {
         results.duration = results.endedAt - results.startedAt;
         return results;
     }
+    RenderCopiedTexture(target, options) {
+        let canvas = null;
+        if (target instanceof offscreen_renderer_1.OffscreenRenderer)
+            canvas = target.canvas;
+        if (target instanceof HTMLCanvasElement)
+            canvas = target;
+        if (canvas === null)
+            throw new Error("Cannot renderer copied texture.");
+        const ctx = this.context;
+        const _options = Object.assign({}, options);
+        ctx.save();
+        ctx.globalAlpha = typeof _options.opacity === "number" ? _options.opacity : 1;
+        ctx.imageSmoothingEnabled = typeof _options.imageSmoothingEnabled === "boolean" ? _options.imageSmoothingEnabled : true;
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.drawImage(canvas, 0, 0, this.scene.width, this.scene.height);
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.restore();
+    }
+    /** Renders a specific render object. Throws an error if no camera instance has been applied to this renderer. */
+    Render(renderObject, deltaTime) {
+        if (!(this.camera instanceof camera_1.Camera))
+            throw new Error("Cannot render objects in camera since no camera has been specified.");
+        const results = {
+            startedAt: Date.now(),
+            endedAt: 0,
+            duration: 0,
+            renderedAmountOfObjects: 0
+        };
+        const ctx = this.context;
+        const camera = this.camera;
+        ctx.save();
+        if (this.transform !== null)
+            ctx.transform(this.transform[0], this.transform[1], this.transform[2], this.transform[3], this.transform[4], this.transform[5]);
+        ctx.translate(camera.x, camera.y);
+        ctx.scale(camera.scaleX, camera.scaleY);
+        const obj = renderObject;
+        if (!this.camera.offScreenRendering) {
+            if (typeof obj.width === "number" && typeof obj.height === "number") {
+                if (!obj.forceRendering) {
+                    if (obj.x > -(((this.camera.x + 30) / this.camera.scaleX) + (obj.width)) && obj.x < -((this.camera.x - this.camera.width) / this.camera.scaleX) &&
+                        obj.y > -((this.camera.y + 30) / this.camera.scaleY) && obj.y < -((this.camera.y - (this.camera.height))) / this.camera.scaleY) {
+                        obj.visible = true;
+                        if (typeof obj.Draw === "function")
+                            obj.Draw(this.context);
+                        if (typeof obj.Update === "function")
+                            obj.Update(this.context, deltaTime);
+                        if (obj.spritesheetController)
+                            obj.spritesheetController.Update(deltaTime);
+                    }
+                    else {
+                        obj.visible = false;
+                    }
+                }
+                else {
+                    if (typeof obj.Draw === "function")
+                        obj.Draw(this.context);
+                    if (typeof obj.Update === "function")
+                        obj.Update(this.context, deltaTime);
+                    if (obj.spritesheetController)
+                        obj.spritesheetController.Update(deltaTime);
+                    obj.visible = false;
+                }
+            }
+            if (typeof obj.radius === "number") {
+                if (!obj.forceRendering) {
+                    if (obj.x > -(((this.camera.x + 30) / this.camera.scaleX) + (obj.radius)) && obj.x < -((this.camera.x - this.camera.width) / this.camera.scaleX) &&
+                        obj.y > -((this.camera.y + 30) / this.camera.scaleY) && obj.y < -((this.camera.y - (this.camera.height))) / this.camera.scaleY) {
+                        obj.visible = true;
+                        if (typeof obj.Draw === "function")
+                            obj.Draw(this.context);
+                        if (typeof obj.Update === "function")
+                            obj.Update(this.context, deltaTime);
+                        if (obj.spritesheetController)
+                            obj.spritesheetController.Update(deltaTime);
+                    }
+                    else {
+                        obj.visible = false;
+                    }
+                }
+                else {
+                    if (typeof obj.Draw === "function")
+                        obj.Draw(this.context);
+                    if (typeof obj.Update === "function")
+                        obj.Update(this.context, deltaTime);
+                    if (obj.spritesheetController)
+                        obj.spritesheetController.Update(deltaTime);
+                    obj.visible = false;
+                }
+            }
+        }
+        else {
+            if (typeof obj.Draw === "function")
+                obj.Draw(this.context);
+            if (typeof obj.Update === "function")
+                obj.Update(this.context, deltaTime);
+            if (obj.spritesheetController)
+                obj.spritesheetController.Update(deltaTime);
+        }
+        if (this.picking) {
+            const now = Date.now();
+            if (now > this.lastPicked + this.pickDelay)
+                this.lastPicked = now;
+        }
+        ctx.restore();
+        results.endedAt = Date.now();
+        results.duration = results.endedAt - results.startedAt;
+        return results;
+    }
     /**
      * Adds a render object to this renderer instance.
      *
      * An error might be thrown if an instance already has been added to this renderer.
      * @param renderObject
-    //*/
+    */
     Add(renderObject) {
         let hasFoundObject = false;
         for (let i = 0; i < this.renderObjects.length; i++) {
@@ -247,6 +356,52 @@ class Renderer {
         return useCollection === true ? new collection_1.Collection(foundObjects) : foundObjects;
     }
     QuerySelector(selector) {
+    }
+    SetTransform(horizontalScaling, verticalSkewing, horizontalSkewing, verticalScaling, horizontalTranslation, verticalTranslation) {
+        this.transform = [
+            horizontalScaling,
+            verticalSkewing,
+            horizontalSkewing,
+            verticalScaling,
+            horizontalTranslation,
+            verticalTranslation
+        ];
+        return this;
+    }
+    /**
+     * Gets a specific transform property and return its value.
+     *
+     * Will return null if the transform property does not contain valid values.
+     * */
+    GetTransformProperty(transformProperty) {
+        if (this.transform === null)
+            return null;
+        switch (transformProperty) {
+            case "hozirontalScaling": return this.transform[0];
+            case "verticalSkewing": return this.transform[1];
+            case "horizontalSkewing": return this.transform[2];
+            case "verticalScaling": return this.transform[3];
+            case "horizontalTranslation": return this.transform[4];
+            case "verticalTranslation": return this.transform[5];
+        }
+        return null;
+    }
+    /**
+     * Sets a specific transform property on the whole renderer itself.
+     *
+     * */
+    SetTransformProperty(transformProperty, value) {
+        if (this.transform === null)
+            return null;
+        switch (transformProperty) {
+            case "hozirontalScaling": this.transform[0] = value;
+            case "verticalSkewing": this.transform[1] = value;
+            case "horizontalSkewing": this.transform[2] = value;
+            case "verticalScaling": this.transform[3] = value;
+            case "horizontalTranslation": this.transform[4] = value;
+            case "verticalTranslation": this.transform[5] = value;
+        }
+        return this.transform;
     }
 }
 exports.Renderer = Renderer;

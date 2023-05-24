@@ -155,8 +155,6 @@ export declare class RenderObject implements RenderObjectConstructor {
      * @param value Value of the style.
     */
     SetStyle(style: keyof RenderObjectStyles, value: any): any;
-    /** Fuckinf fucky fuck fuck fuck */
-    static ApplyRenderStyles(ctx: CanvasRenderingContext2D, styles: RenderObjectStyles): RenderObjectStyleApplyingResults;
     /**
      * Animates just a number from a start value, to an ending value.
      * @param from The value where you want to start animating.
@@ -204,4 +202,6 @@ export declare class RenderObject implements RenderObjectConstructor {
      * */
     GetTransformProperty(transformProperty: RenderObjectTransformProperty): number | null;
     SetTransformProperty(transformProperty: RenderObjectTransformProperty, value: number): number[] | null;
+    /** Fuckinf fucky fuck fuck fuck */
+    static ApplyRenderStyles(ctx: CanvasRenderingContext2D, styles: RenderObjectStyles): RenderObjectStyleApplyingResults;
 }

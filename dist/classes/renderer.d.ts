@@ -1,15 +1,16 @@
-import { CameraConstructor, RendererAttributes, RendererConstructor, Rendering, RenderObjectDataAttributes, SceneConstructor, TransformMatrices } from "../typings";
+import { CameraConstructor, CopyRenderingOptions, RendererAttributes, RendererConstructor, Rendering, RenderMode, RenderObjectDataAttributes, RenderObjectTransformProperty, SceneConstructor } from "../typings";
 import { Scene } from "./scene";
 import { Camera } from "./camera";
 import { RenderObject } from "./renderobject";
 import { Collection } from "./collection";
+import { OffscreenRenderer } from "./offscreen-renderer";
 export declare class Renderer implements RendererConstructor {
     id: string;
     timestamp: number;
     renderObjects: RenderObject[];
     visibleRenderObjects: RenderObject[];
     attributes: {};
-    transform: TransformMatrices | null;
+    transform: number[] | null;
     picking: boolean;
     pickDelay: number;
     lastPicked: number;
@@ -35,13 +36,16 @@ export declare class Renderer implements RendererConstructor {
      */
     PaintScene(color: string): this;
     /** Render all objects in conjunction with the camera linked to this instance */
-    RenderObjectsInCamera(deltaTime: number): Rendering;
+    RenderObjectsInCamera(deltaTime: number, renderMode?: RenderMode): Rendering;
+    RenderCopiedTexture(target: HTMLCanvasElement | OffscreenRenderer, options?: CopyRenderingOptions): void;
+    /** Renders a specific render object. Throws an error if no camera instance has been applied to this renderer. */
+    Render(renderObject: RenderObject, deltaTime: number): Rendering;
     /**
      * Adds a render object to this renderer instance.
      *
      * An error might be thrown if an instance already has been added to this renderer.
      * @param renderObject
-    //*/
+    */
     Add(renderObject: RenderObject): RenderObject;
     /**Enables the ability to analyze the colors in the rendered image */
     EnablePicking(): boolean;
@@ -79,4 +83,16 @@ export declare class Renderer implements RendererConstructor {
      * */
     GetObjectByDataAttribute(attributeName: RenderObjectDataAttributes, attributeValue: string, useCollection?: boolean): RenderObject[] | Collection<RenderObject> | null;
     QuerySelector(selector: string): void;
+    SetTransform(horizontalScaling: number, verticalSkewing: number, horizontalSkewing: number, verticalScaling: number, horizontalTranslation: number, verticalTranslation: number): Renderer;
+    /**
+     * Gets a specific transform property and return its value.
+     *
+     * Will return null if the transform property does not contain valid values.
+     * */
+    GetTransformProperty(transformProperty: RenderObjectTransformProperty): number | null;
+    /**
+     * Sets a specific transform property on the whole renderer itself.
+     *
+     * */
+    SetTransformProperty(transformProperty: RenderObjectTransformProperty, value: number): number[] | null;
 }

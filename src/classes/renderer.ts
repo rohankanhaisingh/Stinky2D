@@ -1,10 +1,11 @@
-import { CameraConstructor, RendererAttributes, RendererConstructor, Rendering, RenderObjectDataAttributes, SceneConstructor, TransformMatrices, UniqueIDFilterKeywords } from "../typings";
+import { CameraConstructor, CopyRenderingOptions, RendererAttributes, RendererConstructor, Rendering, RenderMode, RenderObjectDataAttributes, RenderObjectTransformProperty, SceneConstructor, TransformMatrices, UniqueIDFilterKeywords } from "../typings";
 import { Scene } from "./scene";
 import { UniqueID } from "../functions/uid";
 import { Camera } from "./camera";
 import { RenderObject } from "./renderobject";
 import { SpritesheetController } from "./spritesheet-controller";
 import { Collection } from "./collection";
+import { OffscreenRenderer } from "./offscreen-renderer";
 
 export class Renderer implements RendererConstructor {
 
@@ -15,7 +16,7 @@ export class Renderer implements RendererConstructor {
 
 	public attributes = {};
 
-	public transform: TransformMatrices | null = null;
+	public transform: number[] | null = null;
 
 	public picking: boolean = false;
 	public pickDelay: number = 100;
@@ -81,7 +82,7 @@ export class Renderer implements RendererConstructor {
 	}
 
 	/** Render all objects in conjunction with the camera linked to this instance */
-	public RenderObjectsInCamera(deltaTime: number): Rendering {
+	public RenderObjectsInCamera(deltaTime: number, renderMode?: RenderMode): Rendering {
 
 		if (!(this.camera instanceof Camera)) throw new Error("Cannot render objects in camera since no camera has been specified.");
 
@@ -99,7 +100,7 @@ export class Renderer implements RendererConstructor {
 		ctx.save();
 
 		if (this.transform !== null)
-			ctx.transform(this.transform.horizontalScaling, this.transform.verticalSkewing, this.transform.horizontalSkewing, this.transform.verticalScaling, this.transform.horizontalTranslation, this.transform.verticalTranslation);
+			ctx.transform(this.transform[0], this.transform[1], this.transform[2], this.transform[3], this.transform[4], this.transform[5]);
 
 		ctx.translate(camera.x, camera.y);
 		ctx.scale(camera.scaleX, camera.scaleY);
@@ -206,12 +207,147 @@ export class Renderer implements RendererConstructor {
 		return results;
 	}
 
+	public RenderCopiedTexture(target: HTMLCanvasElement | OffscreenRenderer, options?: CopyRenderingOptions) {
+
+		let canvas: HTMLCanvasElement | null = null;
+
+		if (target instanceof OffscreenRenderer) 
+			canvas = target.canvas;
+
+		if (target instanceof HTMLCanvasElement)
+				canvas = target;
+
+		if (canvas === null)
+			throw new Error("Cannot renderer copied texture.");
+
+		const ctx: CanvasRenderingContext2D = this.context;
+		const _options = {...options};
+
+		ctx.save();
+
+		ctx.globalAlpha = typeof _options.opacity === "number" ? _options.opacity : 1;
+		ctx.imageSmoothingEnabled = typeof _options.imageSmoothingEnabled === "boolean" ? _options.imageSmoothingEnabled : true;
+
+		ctx.globalCompositeOperation = 'lighter';
+
+		ctx.drawImage(canvas, 0, 0, this.scene.width, this.scene.height);
+
+		ctx.globalCompositeOperation = 'source-over';
+
+		ctx.restore();
+	}
+
+	/** Renders a specific render object. Throws an error if no camera instance has been applied to this renderer. */
+	public Render(renderObject: RenderObject, deltaTime: number) {
+
+		if (!(this.camera instanceof Camera)) throw new Error("Cannot render objects in camera since no camera has been specified.");
+
+		const results: Rendering = {
+			startedAt: Date.now(),
+			endedAt: 0,
+			duration: 0,
+			renderedAmountOfObjects: 0
+		}
+
+		const ctx: CanvasRenderingContext2D = this.context;
+		const camera: Camera = this.camera;
+
+		ctx.save();
+
+		if (this.transform !== null)
+			ctx.transform(this.transform[0], this.transform[1], this.transform[2], this.transform[3], this.transform[4], this.transform[5]);
+
+		ctx.translate(camera.x, camera.y);
+		ctx.scale(camera.scaleX, camera.scaleY);
+
+		const obj: RenderObject = renderObject;
+
+		if (!this.camera.offScreenRendering) {
+
+			if (typeof obj.width === "number" && typeof obj.height === "number") {
+
+				if (!obj.forceRendering) {
+					if (obj.x > -(((this.camera.x + 30) / this.camera.scaleX) + (obj.width)) && obj.x < -((this.camera.x - this.camera.width) / this.camera.scaleX) &&
+						obj.y > -((this.camera.y + 30) / this.camera.scaleY) && obj.y < -((this.camera.y - (this.camera.height))) / this.camera.scaleY) {
+						obj.visible = true;
+
+						if (typeof obj.Draw === "function") obj.Draw(this.context);
+						if (typeof obj.Update === "function") obj.Update(this.context, deltaTime);
+
+						if (obj.spritesheetController as SpritesheetController) (obj.spritesheetController as SpritesheetController).Update(deltaTime);
+
+					} else {
+						obj.visible = false;
+					}
+				} else {
+
+					if (typeof obj.Draw === "function") obj.Draw(this.context);
+					if (typeof obj.Update === "function") obj.Update(this.context, deltaTime);
+					if (obj.spritesheetController as SpritesheetController) (obj.spritesheetController as SpritesheetController).Update(deltaTime);
+
+
+					obj.visible = false;
+				}
+
+			}
+
+			if (typeof obj.radius === "number") {
+
+				if (!obj.forceRendering) {
+					if (obj.x > -(((this.camera.x + 30) / this.camera.scaleX) + (obj.radius)) && obj.x < -((this.camera.x - this.camera.width) / this.camera.scaleX) &&
+						obj.y > -((this.camera.y + 30) / this.camera.scaleY) && obj.y < -((this.camera.y - (this.camera.height))) / this.camera.scaleY) {
+
+						obj.visible = true;
+
+						if (typeof obj.Draw === "function") obj.Draw(this.context);
+						if (typeof obj.Update === "function") obj.Update(this.context, deltaTime);
+						if (obj.spritesheetController as SpritesheetController) (obj.spritesheetController as SpritesheetController).Update(deltaTime);
+
+					} else {
+						obj.visible = false;
+					}
+				} else {
+
+					if (typeof obj.Draw === "function") obj.Draw(this.context);
+					if (typeof obj.Update === "function") obj.Update(this.context, deltaTime);
+					if (obj.spritesheetController as SpritesheetController) (obj.spritesheetController as SpritesheetController).Update(deltaTime);
+
+					obj.visible = false;
+				}
+
+			}
+
+		} else {
+
+			if (typeof obj.Draw === "function") obj.Draw(this.context);
+			if (typeof obj.Update === "function") obj.Update(this.context, deltaTime);
+			if (obj.spritesheetController as SpritesheetController) (obj.spritesheetController as SpritesheetController).Update(deltaTime);
+		}
+
+
+		if (this.picking) {
+
+			const now = Date.now();
+
+			if (now > this.lastPicked + this.pickDelay) this.lastPicked = now;
+		}
+
+		ctx.restore();
+
+		results.endedAt = Date.now();
+		results.duration = results.endedAt - results.startedAt;
+
+
+		return results;
+
+	}
+
 	/**
 	 * Adds a render object to this renderer instance.
 	 * 
 	 * An error might be thrown if an instance already has been added to this renderer.
 	 * @param renderObject 
-	//*/
+	*/
 	public Add(renderObject: RenderObject): RenderObject {
 
 		let hasFoundObject: boolean = false;
@@ -226,7 +362,7 @@ export class Renderer implements RendererConstructor {
 		if (hasFoundObject) throw new Error(`Failed to add renderobject (objectID: ${renderObject.id}) to renderer since it has already been added.`);
 
 		renderObject.scene = this.scene as Scene;
-		renderObject.renderer = <RendererConstructor> this as Renderer;
+		renderObject.renderer = this as Renderer;
 
 		this.renderObjects.push(renderObject);
 
@@ -325,5 +461,68 @@ export class Renderer implements RendererConstructor {
 
 	public QuerySelector(selector: string) {
 
+	}
+
+
+	public SetTransform(
+		horizontalScaling: number,
+		verticalSkewing: number,
+		horizontalSkewing: number,
+		verticalScaling: number,
+		horizontalTranslation: number,
+		verticalTranslation: number
+	): Renderer {
+
+		this.transform = [
+			horizontalScaling,
+			verticalSkewing,
+			horizontalSkewing,
+			verticalScaling,
+			horizontalTranslation,
+			verticalTranslation
+		];
+
+		return this;
+	}
+
+	/**
+	 * Gets a specific transform property and return its value.
+	 * 
+	 * Will return null if the transform property does not contain valid values.
+	 * */
+	public GetTransformProperty(transformProperty: RenderObjectTransformProperty): number | null {
+
+		if (this.transform === null) return null;
+
+		switch (transformProperty) {
+			case "hozirontalScaling": return this.transform[0];
+			case "verticalSkewing": return this.transform[1];
+			case "horizontalSkewing": return this.transform[2];
+			case "verticalScaling": return this.transform[3];
+			case "horizontalTranslation": return this.transform[4];
+			case "verticalTranslation": return this.transform[5];
+		}
+
+		return null;
+	}
+
+	/**
+	 * Sets a specific transform property on the whole renderer itself.
+	 * 
+	 * */
+	public SetTransformProperty(transformProperty: RenderObjectTransformProperty, value: number) {
+
+		if (this.transform === null) return null;
+
+		switch (transformProperty) {
+			case "hozirontalScaling": this.transform[0] = value;
+			case "verticalSkewing": this.transform[1] = value;
+			case "horizontalSkewing": this.transform[2] = value;
+			case "verticalScaling": this.transform[3] = value;
+			case "horizontalTranslation": this.transform[4] = value;
+			case "verticalTranslation": this.transform[5] = value;
+		}
+
+		return this.transform;
 	}
 }

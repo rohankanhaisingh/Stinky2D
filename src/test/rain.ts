@@ -2,12 +2,13 @@
  * 2D raining scene.
  */
 
-import { Camera, ColorCodes, Looper, LooperTickState, MouseMoveObject, Renderer, Scene, Vec2, LineSystem2D, RenderObjectStyles, Line2D, RandomIntBetween, AnimateInteger, MouseDownObject, Vector2, WaitFor, RandomColor, Rectangle, Circle, LoadImageSync } from "../index";
+import { Camera, ColorCodes, Looper, LooperTickState, MouseMoveObject, Renderer, Scene, Vec2, LineSystem2D, RenderObjectStyles, Line2D, RandomIntBetween, AnimateInteger, MouseDownObject, Vector2, WaitFor, RandomColor, Rectangle, Circle, LoadImageSync, OffscreenRenderer } from "../index";
 
 const scene = new Scene(innerWidth, innerHeight, document.querySelector(".app .container") as HTMLDivElement);
 const renderer = new Renderer(scene);
 const camera = new Camera(renderer, scene);
 const looper = new Looper();
+const offscreenRenderer = new OffscreenRenderer();
 
 //@ts-expect-error
 window["renderer"] = renderer;
@@ -29,11 +30,11 @@ const textures = {
 
 function updateDomElements() {
 
-	const guiFramerate = <HTMLDivElement>document.querySelector("#game-framerate");
-	const guiDeltatime = <HTMLDivElement>document.querySelector("#game-deltatime");
-	const guiRenderObjects = <HTMLDivElement>document.querySelector("#game-renderobjects");
-	const guiVisibleRenderObjects = <HTMLDivElement>document.querySelector("#game-visible_renderobjects");
-	const guiRenderDuration = <HTMLDivElement>document.querySelector("#game-render_duration");
+	const guiFramerate = document.querySelector("#game-framerate") as HTMLDivElement;
+	const guiDeltatime = document.querySelector("#game-deltatime") as HTMLDivElement;
+	const guiRenderObjects = document.querySelector("#game-renderobjects") as HTMLDivElement;
+	const guiVisibleRenderObjects = document.querySelector("#game-visible_renderobjects") as HTMLDivElement;
+	const guiRenderDuration =document.querySelector("#game-render_duration") as HTMLDivElement;
 
 	guiFramerate.innerText = "Framerate: " + looper.frameRate.toString() + "fps";
 	guiDeltatime.innerText = "Delta time: " + looper.deltaTime.toFixed(2) + "ms";
@@ -62,8 +63,6 @@ async function createLightning(x: number) {
 	const lineSystem = new LineSystem2D(0, 0);
 	const lineStyles: RenderObjectStyles = {
 		strokeColor: ColorCodes.WHITE,
-		shadowBlur: 10,
-		shadowColor: ColorCodes.WHITE,
 		lineWidth: lineWidth,
 		lineCap: "round"
 	};
@@ -144,6 +143,10 @@ async function createLightningLoop() {
 
 async function main() {
 
+	offscreenRenderer.SetDynamicScalingFactor(renderer, 1);
+	//offscreenRenderer.UseGlowEffect(25, 3);
+
+
 	createLightningLoop();
 	createRainFall(350);
 
@@ -168,6 +171,10 @@ async function main() {
 
 		updateRainDroplets(event.deltaTime);
 		updateDomElements();
+
+		offscreenRenderer.CreateTexture(renderer);
+		renderer.RenderCopiedTexture(offscreenRenderer, { opacity: 1 });
+
 	});
 
 	looper.Trigger();

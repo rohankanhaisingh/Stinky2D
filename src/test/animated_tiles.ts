@@ -13,13 +13,14 @@
  * */
 
 import {
-	Renderer, Scene, Looper, Camera, LooperTickState, ColorCodes, Rectangle, RandomColor, WaitFor, AnimateInteger, AnimateHeximalColor, ConvertByteArrayToHex
+	Renderer, Scene, Looper, Camera, LooperTickState, ColorCodes, Rectangle, RandomColor, WaitFor, AnimateInteger, AnimateHeximalColor, ConvertByteArrayToHex, OffscreenRenderer, RandomIntBetween
 } from "..";
 
 const scene: Scene = new Scene(innerWidth, innerHeight, document.querySelector(".app .container") as HTMLDivElement, ["redrawOnResize", "keepSizeToWindow", "disableContextMenu"]);
 const renderer: Renderer = new Renderer(scene, { willReadFrequently: true });
 const camera: Camera = new Camera(renderer, scene);
 const looper: Looper = new Looper();
+const postProcessor = new OffscreenRenderer();
 
 /**
  * Function that generates tile 
@@ -31,17 +32,20 @@ async function createTiles(widthInPixels: number, heightInPixels: number, tileSi
 	const tileWidth: number = Math.round(widthInPixels / tileSize) + 1;
 	const tileHeight: number = Math.round(heightInPixels / tileSize) + 1;
 
+	const baseXShade: number = RandomIntBetween(0, 255);
+	const baseYShade: number = RandomIntBetween(0, 255);
+
 	// Do the loopy loop loop.
 	for (let x: number = 0; x < tileWidth; x += 1) {
 
 		// Calculated the horizontal color shade.
-		const shadeX: number = 255 / tileWidth * x;
+		const shadeX: number = baseXShade / tileWidth * x;
 
 		// Some other loops.
 		for (let y: number = 0; y < tileHeight; y++) {
 
 			// Calculated the vertical color shade.
-			const shadeY: number = 145 / tileHeight * y;
+			const shadeY: number = baseYShade / tileHeight * y;
 
 			// Converting an array containing byte values to a heximal string value.
 			const calculatedHexColor: string = "#" + ConvertByteArrayToHex([shadeX, 142, shadeY]);
@@ -50,9 +54,7 @@ async function createTiles(widthInPixels: number, heightInPixels: number, tileSi
 			// Yeah the rest speaks for itself.
 
 			const tile: Rectangle = new Rectangle(x * (tileSize + gap), y * (tileSize + gap), tileSize, tileSize, {
-				backgroundColor: calculatedHexColor,
-				shadowBlur: 60,
-				shadowColor: calculatedHexColor
+				backgroundColor: calculatedHexColor
 			});
 
 			tile.AddEventListener("mouseDown", function () {
@@ -63,7 +65,7 @@ async function createTiles(widthInPixels: number, heightInPixels: number, tileSi
 				
 			renderer.Add(tile);
 
-			AnimateInteger(0, 1, "easeOutExpo", 1000, opacity => tile.SetStyle("opacity", opacity));
+			// AnimateInteger(0, 1, "easeOutExpo", 1000, opacity => tile.SetStyle("opacity", opacity));
 
 			if (delay !== 0) await WaitFor(delay);
 		}
@@ -74,11 +76,11 @@ let renderDuration: number = 0;
 
 function updateDomElements() {
 
-	const guiFramerate = <HTMLDivElement>document.querySelector("#game-framerate");
-	const guiDeltatime = <HTMLDivElement>document.querySelector("#game-deltatime");
-	const guiRenderObjects = <HTMLDivElement>document.querySelector("#game-renderobjects");
-	const guiVisibleRenderObjects = <HTMLDivElement>document.querySelector("#game-visible_renderobjects");
-	const guiRenderDuration = <HTMLDivElement>document.querySelector("#game-render_duration");
+	const guiFramerate = document.querySelector("#game-framerate") as HTMLDivElement;
+	const guiDeltatime = document.querySelector("#game-deltatime") as HTMLDivElement;
+	const guiRenderObjects = document.querySelector("#game-renderobjects") as HTMLDivElement;
+	const guiVisibleRenderObjects = document.querySelector("#game-visible_renderobjects") as HTMLDivElement;
+	const guiRenderDuration = document.querySelector("#game-render_duration") as HTMLDivElement;
 
 	guiFramerate.innerText = "Framerate: " + looper.frameRate.toString() + "fps";
 	guiDeltatime.innerText = "Delta time: " + looper.deltaTime.toFixed(2) + "ms";
@@ -87,21 +89,28 @@ function updateDomElements() {
 	guiRenderDuration.innerText = "Render time: " + renderDuration.toString() + " ms";
 }
 
-function render(event: LooperTickState) {
+function render(event: LooperTickState | null) {
 
 	renderer.ClearScene();
 	renderer.PaintScene(ColorCodes.BLACK);
-	renderDuration = renderer.RenderObjectsInCamera(event.deltaTime).duration;
+	renderDuration = renderer.RenderObjectsInCamera(0).duration;
+
+	postProcessor.CreateTexture(renderer);
+	renderer.RenderCopiedTexture(postProcessor, { opacity: 0.5 });
 
 	updateDomElements();
 }
 
 async function setup() {
 
+	postProcessor.SetDynamicScalingFactor(renderer, .2);
+	postProcessor.UseGlowEffect(5, 2);
+
 	looper.Trigger();
 
 	createTiles(600, 600, 50, 20, 0);
+
+	render(null);
 }
 
-looper.AddEventListener("update", render);
 window.addEventListener("load", setup);
