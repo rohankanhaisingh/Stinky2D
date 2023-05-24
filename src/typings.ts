@@ -19,8 +19,9 @@ export type AudioNode2DControllerNodes = BiquadFilterNode | StereoPannerNode | G
 export type AudioNode2DControllerNodeName = "BiquadFilter" | "StereoPanner" | "GainNode" | "AnalyserNode";
 export type AudioNode2DAnalyserFFTSize = 32 | 64 | 128 | 256 | 512 | 1024 | 2048 | 4096 | 8192 | 16384 | 32768;
 export type CollectionElementTypes = "string" | "number" | "bigint" | "boolean" | "symbol" | "undefined" | "object" | "function";
-export type RenderObjectDataAttributes = "data-id" | "data-name" | "data-behavior" | "data-timestamp" | "data-appearance";
+export type RenderObjectDataAttributes = "data-id" | "data-name" | "data-behavior" | "data-timestamp" | "data-appearance" | string;
 export type RenderObjectTransformProperty = "hozirontalScaling" | "verticalSkewing" | "horizontalSkewing" | "verticalScaling" | "horizontalTranslation" | "verticalTranslation";
+export type RenderMode = "firstToLast" | "lastToFirst";
 
 /*
  * Interface representing an object that will be returned
@@ -172,7 +173,7 @@ export interface RendererConstructor {
 	attributes: RendererAttributes;
 	renderObjects: RenderObjectConstructor[];
 	visibleRenderObjects: RenderObjectConstructor[];
-	transform: TransformMatrices | null;
+	transform: number[] | null;
 	camera?: CameraConstructor;
 }
 
@@ -387,6 +388,11 @@ export interface RigidBody2DConstructor {
 	acceleration: Vec2 | Vector2;
 }
 
+export interface PhysicsWorld2DConstructor {
+	readonly id: string;
+	readonly timestamp: number;
+}
+
 export interface SceneResizeEventFunction {
 	readonly bruh: any;
 }
@@ -564,6 +570,11 @@ export interface CompressorPreset {
 
 export interface CompressorPresetsMap {
 	"master-no-clip": CompressorPreset;
+}
+
+export interface CopyRenderingOptions {
+	opacity?: number;
+	imageSmoothingEnabled?: boolean;
 }
 
 declare global {
