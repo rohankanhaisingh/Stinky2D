@@ -596,46 +596,6 @@ export class RenderObject implements RenderObjectConstructor {
 
 	// =============== Static methods ===============
 
-	/** Fuckinf fucky fuck fuck fuck */
-	public static ApplyRenderStyles(ctx: CanvasRenderingContext2D, styles: RenderObjectStyles): RenderObjectStyleApplyingResults {
-
-		const startedAt: number = Date.now();
-
-		if (typeof styles.direction === "string") ctx.direction = styles.direction;
-		if (typeof styles.backgroundColor === "string") ctx.fillStyle = styles.backgroundColor;
-		if (typeof styles.textColor === "string") ctx.fillStyle = styles.textColor;
-		if (typeof styles.filter === "string") ctx.filter = styles.filter;
-		if (typeof styles.font === "string") ctx.font = styles.font;
-		if (typeof styles.opacity === "number") ctx.globalAlpha = styles.opacity;
-		if (typeof styles.globalCompositeOperation === "string") ctx.globalCompositeOperation = styles.globalCompositeOperation;
-		if (typeof styles.imageSmoothingEnabled === "boolean") ctx.imageSmoothingEnabled = styles.imageSmoothingEnabled;
-		if (typeof styles.imageSmoothingQuality === "string") ctx.imageSmoothingQuality = styles.imageSmoothingQuality;
-		if (typeof styles.lineCap === "string") ctx.lineCap = styles.lineCap;
-		if (typeof styles.lineDashOffset === "number") ctx.lineDashOffset = styles.lineDashOffset;
-		if (typeof styles.lineJoin === "string") ctx.lineJoin = styles.lineJoin;
-		if (typeof styles.miterLimit === "number") ctx.miterLimit = styles.miterLimit;
-		if (typeof styles.borderWidth === "number") ctx.lineWidth = styles.borderWidth;
-		if (typeof styles.strokeWidth === "number") ctx.lineWidth = styles.strokeWidth;
-		if (typeof styles.lineWidth === "number") ctx.lineWidth = styles.lineWidth;
-		if (typeof styles.borderColor === "string") ctx.strokeStyle = styles.borderColor;
-		if (typeof styles.strokeColor === "string") ctx.strokeStyle = styles.strokeColor;
-		if (typeof styles.textStrokeColor === "string") ctx.strokeStyle = styles.textStrokeColor;
-		if (typeof styles.shadowBlur === "number") ctx.shadowBlur = styles.shadowBlur;
-		if (typeof styles.shadowColor === "string") ctx.shadowColor = styles.shadowColor;
-		if (typeof styles.shadowOffsetX === "number") ctx.shadowOffsetX = styles.shadowOffsetX;
-		if (typeof styles.shadowOffsetY === "number") ctx.shadowOffsetY = styles.shadowOffsetY;
-		if (typeof styles.textAlign === "string") ctx.textAlign = styles.textAlign;
-		if (typeof styles.textBaseline === "string") ctx.textBaseline = styles.textBaseline;
-
-		const endedAt: number = Date.now();
-
-		return {
-			startedAt: startedAt,
-			endedAt: endedAt,
-			duration: endedAt - startedAt
-		}
-	}
-
 	/**
 	 * Animates just a number from a start value, to an ending value.
 	 * @param from The value where you want to start animating.
@@ -694,7 +654,6 @@ export class RenderObject implements RenderObjectConstructor {
 
 		return this.scaling === null ? null : this.scaling.x;
 	}
-
 
 	/**
 	 * Set the scale y property on this render object.
@@ -799,4 +758,45 @@ export class RenderObject implements RenderObjectConstructor {
 
 		return this.transform;
 	}
+
+	/** Fuckinf fucky fuck fuck fuck */
+	public static ApplyRenderStyles(ctx: CanvasRenderingContext2D, styles: RenderObjectStyles): RenderObjectStyleApplyingResults {
+
+		const startedAt: number = Date.now();
+
+		if (typeof styles.direction === "string") ctx.direction = styles.direction;
+		if (typeof styles.backgroundColor === "string") ctx.fillStyle = styles.backgroundColor;
+		if (typeof styles.textColor === "string") ctx.fillStyle = styles.textColor;
+		if (typeof styles.filter === "string") ctx.filter = styles.filter;
+		if (typeof styles.font === "string") ctx.font = styles.font;
+		if (typeof styles.opacity === "number") ctx.globalAlpha = styles.opacity;
+		if (typeof styles.globalCompositeOperation === "string") ctx.globalCompositeOperation = styles.globalCompositeOperation;
+		if (typeof styles.imageSmoothingEnabled === "boolean") ctx.imageSmoothingEnabled = styles.imageSmoothingEnabled;
+		if (typeof styles.imageSmoothingQuality === "string") ctx.imageSmoothingQuality = styles.imageSmoothingQuality;
+		if (typeof styles.lineCap === "string") ctx.lineCap = styles.lineCap;
+		if (typeof styles.lineDashOffset === "number") ctx.lineDashOffset = styles.lineDashOffset;
+		if (typeof styles.lineJoin === "string") ctx.lineJoin = styles.lineJoin;
+		if (typeof styles.miterLimit === "number") ctx.miterLimit = styles.miterLimit;
+		if (typeof styles.borderWidth === "number") ctx.lineWidth = styles.borderWidth;
+		if (typeof styles.strokeWidth === "number") ctx.lineWidth = styles.strokeWidth;
+		if (typeof styles.lineWidth === "number") ctx.lineWidth = styles.lineWidth;
+		if (typeof styles.borderColor === "string") ctx.strokeStyle = styles.borderColor;
+		if (typeof styles.strokeColor === "string") ctx.strokeStyle = styles.strokeColor;
+		if (typeof styles.textStrokeColor === "string") ctx.strokeStyle = styles.textStrokeColor;
+		if (typeof styles.shadowBlur === "number") ctx.shadowBlur = styles.shadowBlur;
+		if (typeof styles.shadowColor === "string") ctx.shadowColor = styles.shadowColor;
+		if (typeof styles.shadowOffsetX === "number") ctx.shadowOffsetX = styles.shadowOffsetX;
+		if (typeof styles.shadowOffsetY === "number") ctx.shadowOffsetY = styles.shadowOffsetY;
+		if (typeof styles.textAlign === "string") ctx.textAlign = styles.textAlign;
+		if (typeof styles.textBaseline === "string") ctx.textBaseline = styles.textBaseline;
+
+		const endedAt: number = Date.now();
+
+		return {
+			startedAt: startedAt,
+			endedAt: endedAt,
+			duration: endedAt - startedAt
+		}
+	}
+
 }
