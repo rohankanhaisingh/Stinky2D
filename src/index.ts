@@ -15,9 +15,10 @@ export { Line2D, LineSystem2D } from "./classes/linesystem";
 export { SpritesheetController } from "./classes/spritesheet-controller";
 export { AudioSystem2D, AudioNode2D } from "./classes/audio-system-2d";
 export { Collection } from "./classes/collection";
-export { RigidBody2D } from "./classes/physics-2d";
+export { RigidBody2D, PhysicsWorld2D } from "./classes/physics-2d";
 export { Plugins } from "./classes/plugins";
 export { GamepadController, GamepadHandler } from "./classes/controller";
+export { OffscreenRenderer } from "./classes/offscreen-renderer";
 
 export {
 	ColorCodes,
@@ -133,7 +134,10 @@ export {
 	GamepadControllerUniversalDirectionalButtons,
 	GamepadHandlerConstructor,
 	PS4DualShockMap,
-	PS4DualShockRightButtonsMap
+	PS4DualShockRightButtonsMap,
+	RenderMode,
+	CopyRenderingOptions,
+	PhysicsWorld2DConstructor
 } from "./typings";
 
 import "./constants/global";
