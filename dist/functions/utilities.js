@@ -77,7 +77,7 @@ function SimplifyImageData(imageData) {
         colorSpace: imageData.colorSpace,
         width: imageData.width,
         height: imageData.height,
-        hex: (0, colors_1.ConvertByteArrayToHex)([imageData.data[0], imageData.data[1], imageData.data[2]])
+        hex: "#" + (0, colors_1.ConvertByteArrayToHex)([imageData.data[0], imageData.data[1], imageData.data[2]]).toUpperCase()
     };
 }
 exports.SimplifyImageData = SimplifyImageData;

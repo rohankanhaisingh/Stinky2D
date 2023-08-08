@@ -33,6 +33,7 @@ class Looper {
         this.times.push(now);
         this.frameRate = this.times.length;
         const state = {
+            now: now,
             deltaTime: this.deltaTime,
             frameRate: this.frameRate,
             lastTimestamp: this.lastTimestamp,

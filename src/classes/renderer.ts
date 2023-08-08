@@ -364,6 +364,7 @@ export class Renderer implements RendererConstructor {
 		renderObject.scene = this.scene as Scene;
 		renderObject.renderer = this as Renderer;
 
+		renderObject.arrayIndex = this.renderObjects.length;
 		this.renderObjects.push(renderObject);
 
 		renderObject.OnAdd(this);
@@ -463,7 +464,17 @@ export class Renderer implements RendererConstructor {
 
 	}
 
-
+	/**
+	 Sets the transformation matrix for the renderer.
+	 
+	 @param {number} horizontalScaling - The horizontal scaling factor.
+	 @param {number} verticalSkewing - The vertical skewing factor.
+	 @param {number} horizontalSkewing - The horizontal skewing factor.
+	 @param {number} verticalScaling - The vertical scaling factor.
+	 @param {number} horizontalTranslation - The horizontal translation value.
+	 @param {number} verticalTranslation - The vertical translation value.
+	 @returns {Renderer} - The updated renderer object.
+	*/
 	public SetTransform(
 		horizontalScaling: number,
 		verticalSkewing: number,

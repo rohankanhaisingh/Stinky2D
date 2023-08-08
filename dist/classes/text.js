@@ -3,6 +3,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TextNode = void 0;
 const renderobject_1 = require("./renderobject");
 class TextNode extends renderobject_1.RenderObject {
+    /**
+    Creates a new TextNode instance.
+    @param {string} text - The text content of the node.
+    @param {number} x - The x-coordinate of the node's position.
+    @param {number} y - The y-coordinate of the node's position.
+    @param {number | null} width - The width of the text node. If null, default width of 10 will be used.
+    @param {number | null} height - The height of the text node. If null, default height of 10 will be used.
+    @param {RenderObjectStyles} [styles] - The styles to be applied to the text node.
+    */
     constructor(text, x, y, width, height, styles) {
         super();
         this.text = "";

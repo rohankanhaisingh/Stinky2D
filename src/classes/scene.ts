@@ -1,4 +1,4 @@
-import { Vec2 } from "../functions/math";
+import { RandomIntBetween, Vec2 } from "../functions/math";
 import { UniqueID } from "../functions/uid";
 import { CameraConstructor, MouseDownObject, MouseEnterObject, MouseMoveObject, MouseOutObject, MouseUpObject, MouseWheelObject, RendererConstructor, SceneAttributes, SceneConstructor, SceneEventsMap, SceneImageFormat, SceneMouseObject, Vector2 } from "../typings";
 import { Camera } from "./camera";
@@ -34,8 +34,6 @@ function createMouseObject(): SceneMouseObject {
 		wheelDirection: null
 	}
 }
-
-
 
 export class Scene implements SceneConstructor {
 
@@ -325,5 +323,10 @@ export class Scene implements SceneConstructor {
 		const y: number = this.canvasElement.height / 2;
 
 		return new Vec2(x, y);
+	}
+
+	public GetRandomPosition(): Vec2 {
+
+		return new Vec2(RandomIntBetween(0, this.width), RandomIntBetween(0, this.height));
 	}
 }

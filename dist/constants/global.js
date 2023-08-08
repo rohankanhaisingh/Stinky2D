@@ -1,4 +1,5 @@
 "use strict";
+// @ts-nocheck
 const Utilities = require("../functions/utilities");
 const MathUtils = require("../functions/math");
 (function () {

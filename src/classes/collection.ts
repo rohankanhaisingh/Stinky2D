@@ -117,10 +117,9 @@ export class Collection<T = any> {
 
 		let isEqual = false;
 
-		for (let element of this.elements) {
-
-			if (element === object) isEqual = true;
-		}
+		for (let element of this.elements) 
+			if (element === object)
+				isEqual = true;
 
 		return isEqual;
 	}

@@ -83,6 +83,17 @@ export declare class Renderer implements RendererConstructor {
      * */
     GetObjectByDataAttribute(attributeName: RenderObjectDataAttributes, attributeValue: string, useCollection?: boolean): RenderObject[] | Collection<RenderObject> | null;
     QuerySelector(selector: string): void;
+    /**
+     Sets the transformation matrix for the renderer.
+     
+     @param {number} horizontalScaling - The horizontal scaling factor.
+     @param {number} verticalSkewing - The vertical skewing factor.
+     @param {number} horizontalSkewing - The horizontal skewing factor.
+     @param {number} verticalScaling - The vertical scaling factor.
+     @param {number} horizontalTranslation - The horizontal translation value.
+     @param {number} verticalTranslation - The vertical translation value.
+     @returns {Renderer} - The updated renderer object.
+    */
     SetTransform(horizontalScaling: number, verticalSkewing: number, horizontalSkewing: number, verticalScaling: number, horizontalTranslation: number, verticalTranslation: number): Renderer;
     /**
      * Gets a specific transform property and return its value.

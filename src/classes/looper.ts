@@ -1,5 +1,5 @@
 import { UniqueID } from "../functions/uid";
-import { LooperConstructor, LooperEventNames, LooperEvents, LooperTickState, RendererConstructor } from "../typings";
+import { LooperConstructor, LooperEventNames, LooperEvents, LooperOnUpdateEvent, RendererConstructor } from "../typings";
 import { Renderer } from "./renderer";
 
 export class Looper implements LooperConstructor {
@@ -32,7 +32,7 @@ export class Looper implements LooperConstructor {
 
 	}
 
-	private _tick(timestamp: number): LooperTickState {
+	private _tick(timestamp: number): LooperOnUpdateEvent {
 
 		this.animationFrame = window.requestAnimationFrame((d: number) => this._tick(d))
 
@@ -47,7 +47,8 @@ export class Looper implements LooperConstructor {
 		this.times.push(now);
 		this.frameRate = this.times.length;
 
-		const state: LooperTickState = {
+		const state: LooperOnUpdateEvent = {
+			now: now,
 			deltaTime: this.deltaTime,
 			frameRate: this.frameRate,
 			lastTimestamp: this.lastTimestamp,
@@ -74,7 +75,7 @@ export class Looper implements LooperConstructor {
 	 * @param event Event name
 	 * @param cb Callback function
 	 */
-	public AddEventListener(event: LooperEventNames, cb: (state: LooperTickState) => void): Looper {
+	public AddEventListener(event: LooperEventNames, cb: (state: LooperOnUpdateEvent) => void): Looper {
 
 		switch (event) {
 			case "update":

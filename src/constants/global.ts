@@ -1,4 +1,6 @@
-const Utilities: {[key: string]: any} = require("../functions/utilities");
+// @ts-nocheck
+
+const Utilities: { [key: string]: any } = require("../functions/utilities");
 const MathUtils: {[key: string]: any} = require("../functions/math");
 
 (function () {

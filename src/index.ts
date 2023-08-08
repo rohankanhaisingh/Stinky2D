@@ -52,6 +52,15 @@ export {
 } from "./functions/math";
 
 export {
+	ActiveKeys,
+	KeyDownListeners,
+	KeyUpListeners,
+	OnKeyDown,
+	OnKeyUp,
+	GetKeyDown
+} from "./functions/keyboard";
+
+export {
 	SceneConstructor,
 	SceneMouseButtonsObject,
 	SceneMouseObject,
@@ -70,9 +79,8 @@ export {
 	Vector2,
 	Vector3,
 	LooperConstructor,
-	LooperTickState,
-	LooperEvents,
 	LooperOnUpdateEvent,
+	LooperEvents,
 	LooperEventNames,
 	RenderObjectStyles,
 	RectangleConstructor,
@@ -85,7 +93,7 @@ export {
 	MouseOutObject,
 	MouseEnterObject,
 	DragOffsetType,
-	RectangleDragConfiguration,
+	RenderObjectDragConfiguration,
 	DragMouseButton,
 	EasingName,
 	TextConstructor,
@@ -137,7 +145,10 @@ export {
 	PS4DualShockRightButtonsMap,
 	RenderMode,
 	CopyRenderingOptions,
-	PhysicsWorld2DConstructor
+	PhysicsWorld2DConstructor,
+	InputEvent,
+	InputType,
+	CameraFocusAnimation
 } from "./typings";
 
 import "./constants/global";

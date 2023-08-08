@@ -39,4 +39,5 @@ export declare class OffscreenRenderer {
      * @param brightness
      */
     UseGlowEffect(blurStrength: number, brightness: number): void;
+    CopyTexture(renderer: Renderer): void;
 }

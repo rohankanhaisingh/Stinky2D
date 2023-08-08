@@ -1,4 +1,4 @@
-import { DragMouseButton, DragOffsetType, RectangleConstructor, RectangleDragConfiguration, RenderObjectStyles, SceneConstructor } from "../typings";
+import { DragMouseButton, DragOffsetType, RectangleConstructor, RenderObjectDragConfiguration, RenderObjectStyles, SceneConstructor } from "../typings";
 import { RenderObject } from "./renderobject";
 import { Scene } from "./scene";
 export declare class Rectangle extends RenderObject implements RectangleConstructor {
@@ -10,7 +10,7 @@ export declare class Rectangle extends RenderObject implements RectangleConstruc
     height: number;
     rotation: number;
     styles: RenderObjectStyles;
-    dragConfig: RectangleDragConfiguration;
+    dragConfig: RenderObjectDragConfiguration;
     private _mouseOffset;
     /**
      * Creates a grapical render component representing a rectangle, allowing you to customize it manually.

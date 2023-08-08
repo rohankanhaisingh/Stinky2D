@@ -1,23 +1,27 @@
-import { Vec2 } from "../functions/math";
 import { PhysicsWorld2DConstructor, RigidBody2DConstructor } from "../typings";
 import { RenderObject } from "./renderobject";
+import { Body, World, Circle, Box, Fixture, FixtureOpt } from "planck-js";
 export declare class PhysicsWorld2D implements PhysicsWorld2DConstructor {
     id: string;
     timestamp: number;
     gravity: number;
     rigidBodies: RigidBody2D[];
+    world: World;
     constructor();
     Update(deltaTime: number): void;
-    AddRigidBody(rigidBody: RigidBody2D): PhysicsWorld2D;
+    SetGravity(horizontalGravityForce: number, verticalGravityForce: number): void;
 }
 export declare class RigidBody2D implements RigidBody2DConstructor {
     id: string;
     timestamp: number;
     renderObject: RenderObject;
-    position: Vec2;
-    velocity: Vec2;
-    acceleration: Vec2;
-    mass: number;
-    isStatic: boolean;
-    constructor(renderObject: RenderObject, mass: number, isStatic: boolean);
+    physicsWorld2D: PhysicsWorld2D;
+    body: Body;
+    shape: Box | Circle;
+    fixture: Fixture;
+    constructor(physicsWorld2D: PhysicsWorld2D, renderObject: RenderObject, fixtureOptions?: FixtureOpt);
+    SetDynamic(): RigidBody2D;
+    SetFixture(fixtureDef: FixtureOpt): RigidBody2D;
+    ApplyCenterForce(x: number, y: number): this;
+    Update(): void;
 }

@@ -1,4 +1,4 @@
-import { LooperConstructor, LooperEventNames, LooperEvents, LooperTickState, RendererConstructor } from "../typings";
+import { LooperConstructor, LooperEventNames, LooperEvents, LooperOnUpdateEvent, RendererConstructor } from "../typings";
 import { Renderer } from "./renderer";
 export declare class Looper implements LooperConstructor {
     id: string;
@@ -25,5 +25,5 @@ export declare class Looper implements LooperConstructor {
      * @param event Event name
      * @param cb Callback function
      */
-    AddEventListener(event: LooperEventNames, cb: (state: LooperTickState) => void): Looper;
+    AddEventListener(event: LooperEventNames, cb: (state: LooperOnUpdateEvent) => void): Looper;
 }

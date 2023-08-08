@@ -60,5 +60,7 @@ class OffscreenRenderer {
     UseGlowEffect(blurStrength, brightness) {
         this.glowFilter = `blur(${blurStrength}px) brightness(${brightness * 100}%)`;
     }
+    CopyTexture(renderer) {
+    }
 }
 exports.OffscreenRenderer = OffscreenRenderer;

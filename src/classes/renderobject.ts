@@ -1,5 +1,6 @@
 import { ConvertByteArrayToHex, ConvertHexToByteArray, FixedHexToRgbArray } from "../constants/colors";
 import { Easings } from "../functions/easings";
+import { Vec2 } from "../functions/math";
 import { UniqueID } from "../functions/uid";
 import {
 	Dimension2D,
@@ -15,6 +16,8 @@ import {
 	Vector2
 } from "../typings";
 import { AudioNode2D } from "./audio-system-2d";
+import { Circle } from "./circle";
+import { Rectangle } from "./rectangle";
 import { Renderer } from "./renderer";
 import { Scene } from "./scene";
 import { SpritesheetController } from "./spritesheet-controller";
@@ -28,57 +31,181 @@ function checkSquareProperties(obj: RenderObject) {
 	return false;
 } 
 
+function isMouseInCircle(mouseX: number, mouseY: number, circleX: number, circleY: number, circleRadius: number): boolean {
+
+	const dx = mouseX - circleX,
+		dy = mouseY - circleY,
+		distance = Math.sqrt(dx * dx + dy * dy);
+
+	return distance <= circleRadius;
+}
+
 export const AllExistingRenderObjects: RenderObject[] = [];
 
 export class RenderObject implements RenderObjectConstructor {
 
+	/** Unique generated id for each render object. */
 	public id = UniqueID(18).id;
+
+	/** Counts the amount of render objects created in general. */
 	public exisitingObjectCount = AllExistingRenderObjects.length + 1;
+
+	/** Timestamp of when the render object has been made. */
 	public timestamp = Date.now();
 
+	/** Array index of renderer instance. */
+	public arrayIndex: number = 0;
+
+	/** Boolean which determines whether the object is visible or not. */
 	public visible: boolean = true;
+
+	/** Forces rendering outside the camera view/ */
 	public forceRendering: boolean = false;
 
+	/** Render object attributes. */
 	public attributes: { [K in RenderObjectDataAttributes]?: string } = {};
 
-	public events: {[key: string]: Function} = {};
+	/** All events stored in this object. */
+	public events: { [key: string]: Function } = {};
+
+	/** All events that will be emitted once. */
 	public eventsOnce: { [key: string]: Function } = {};
 
-	public eventStates = {
-		hasEntered: false,
-		hasLeft: false,
-		hasClicked: false,
-		isDown: false,
-		isUp: false
-	};
+	/** Event states.*/
+	public eventStates = { hasEntered: false, hasLeft: false, hasClicked: false, isDown: false, isUp: false };
 
+	/** Render object children applied to this instance. */
 	public children: RenderObject[] = [];
 
+	/** Audio node applied to this instance. */
 	public audioNodes: AudioNode2D[] = [];
 
+	public styleGroups: { [K: string]: RenderObjectStyles } = {};
 
-	declare public x: number;
+	/**
+	 * The x-coordinate of the object.
+	 * @type {number}
+	 * @public
+	 */
+	declare  public x: number;
+
+	/**
+	 * The y-coordinate of the object.
+	 * @type {number}
+	 * @public
+	 */
 	declare public y: number;
+
+	/**
+	 * The width of the object.
+	 * @type {number}
+	 * @public
+	 */
 	declare public width: number;
+
+	/**
+	 * The height of the object.
+	 * @type {number}
+	 * @public
+	 */
 	declare public height: number;
+
+	/**
+	 * The radius of the object.
+	 * @type {number}
+	 * @public
+	 */
 	declare public radius: number;
+
+	/**
+	 * The segments of the object.
+	 * @type {Vector[]}
+	 * @public
+	 */
 	declare public segments: Vector2[];
+
+	/**
+	 * The styles of the object.
+	 * @type {RenderObjectStyles}
+	 * @public
+	 */
 	declare public styles: RenderObjectStyles;
 
+	/**
+   * The transform of the object.
+   * @type {number[] | null}
+   * @public
+   */
 	declare public transform: number[] | null;
+
+	/**
+	 * The scaling of the object.
+	 * @type {Vector2 | null}
+	 * @public
+	 */
 	declare public scaling: Vector2 | null;
 
+	/**
+	 * The rotation of the object.
+	 * @type {number}
+	 * @public
+	 */
 	declare public rotation: number;
 
+	/**
+	 * The velocity in the X direction.
+	 * @type {number}
+	 * @public
+	 */
 	declare public velocityX: number;
+
+	/**
+	 * The velocity in the Y direction.
+	 * @type {number}
+	 * @public
+	 */
 	declare public velocityY: number;
+
+	/**
+	 * The acceleration of the object.
+	 * @type {number}
+	 * @public
+	 */
 	declare public acceleration: number;
+
+	/**
+	 * The mass of the object.
+	 * @type {number}
+	 * @public
+	 */
 	declare public mass: number;
 
+	/**
+	 * The scene that the object belongs to.
+	 * @type {Scene}
+	 * @public
+	 */
 	declare public scene: Scene;
+
+	/**
+	 * The renderer used to render the object.
+	 * @type {Renderer}
+	 * @public
+	 */
 	declare public renderer: Renderer;
 
+	/**
+	 * The initial position of the object.
+	 * @type {Vector2}
+	 * @public
+	 */
 	declare public initialPosition: Vector2;
+
+	/**
+	 * The initial dimensions of the object.
+	 * @type {Dimension2D}
+	 * @public
+	 */
 	declare public initialDimension: Dimension2D;
 
 	declare public spritesheetController?: SpritesheetController | SpritesheetControllerConstructor;
@@ -91,91 +218,86 @@ export class RenderObject implements RenderObjectConstructor {
 		AllExistingRenderObjects.push(this);
 	}
 
-	public Draw(ctx: CanvasRenderingContext2D) {
+	public Draw(ctx: CanvasRenderingContext2D) { return 0; }
+	public Update(ctx: CanvasRenderingContext2D, deltaTime: number) { return 0; }
+	public OnAdd(renderer: Renderer) { return; }
 
-		return 0;
-	}
-	public Update(ctx: CanvasRenderingContext2D, deltaTime: number) {
+	private _handleEventProperties(isInObject: boolean, fixedMousePosition: Vector2) {
 
-		return 0;
-	}
+		if (isInObject) {
 
-	public OnAdd(renderer: Renderer) {
+			if (!this.eventStates.hasEntered) {
 
-		return;
+				if (typeof this.events["mouseEnter"] === "function") this.events["mouseEnter"]({
+					target: this,
+					mousePosition: fixedMousePosition,
+					mouse: this.scene.mouse
+				});
+
+				this.eventStates.hasLeft = false;
+				this.eventStates.hasEntered = true;
+			}
+
+			if (this.scene.mouse.buttons.left || this.scene.mouse.buttons.middle || this.scene.mouse.buttons.right) {
+
+				if (!this.eventStates.isDown) {
+
+					if (typeof this.events["mouseDown"] === "function") this.events["mouseDown"]({
+						target: this,
+						mousePosition: fixedMousePosition,
+						mouse: this.scene.mouse
+					});
+
+					this.eventStates.isDown = true;
+				}
+
+				this.eventStates.isDown = false;
+
+				if (typeof this.events["mouseDown"] === "function") this.scene.mouse.buttons.resetState();
+			}
+
+			if (this.scene.mouse.wheelDirection !== null) {
+
+				if (typeof this.events["mouseWheel"] === "function") this.events["mouseWheel"]({
+					target: this,
+					mousePosition: fixedMousePosition,
+					mouse: this.scene.mouse
+				});
+
+				this.scene.mouse.wheelDirection = null;
+			}
+
+		} else {
+
+			if (this.eventStates.hasClicked) this.eventStates.hasClicked = false;
+
+			if (this.eventStates.hasEntered) {
+
+				if (typeof this.events["mouseOut"] === "function") this.events["mouseOut"]({
+					target: this,
+					mousePosition: fixedMousePosition,
+					mouse: this.scene.mouse
+				});
+
+				this.eventStates.hasLeft = true;
+				this.eventStates.hasEntered = false;
+			}
+		}
 	}
 
 	private _updateOnMouseOverEvent() {
 
 		const fixedMousePosition: Vector2 = this.scene.GetFixedMousePosition();
 
-
 		if (typeof this.width === "number" && typeof this.height === "number") {
 
 			const isInObject: boolean = fixedMousePosition.x >= this.x && fixedMousePosition.x <= this.x + this.width && fixedMousePosition.y >= this.y && fixedMousePosition.y <= this.y + this.height;
-			
-			if (isInObject) {
 
-				if (!this.eventStates.hasEntered) {
-
-					if (typeof this.events["mouseEnter"] === "function") this.events["mouseEnter"]({
-						target: this,
-						mousePosition: fixedMousePosition,
-						mouse: this.scene.mouse
-					});
-
-					this.eventStates.hasLeft = false;
-					this.eventStates.hasEntered = true;
-				}
-
-				if (this.scene.mouse.buttons.left || this.scene.mouse.buttons.middle || this.scene.mouse.buttons.right) {
-
-					if (!this.eventStates.isDown) {
-
-						if (typeof this.events["mouseDown"] === "function") this.events["mouseDown"]({
-							target: this,
-							mousePosition: fixedMousePosition,
-							mouse: this.scene.mouse
-						});
-
-						this.eventStates.isDown = true;
-					}
-
-					this.eventStates.isDown = false;
-
-					if (typeof this.events["mouseDown"] === "function") this.scene.mouse.buttons.resetState();
-				} 
-
-				if (this.scene.mouse.wheelDirection !== null) {
-
-					if (typeof this.events["mouseWheel"] === "function") this.events["mouseWheel"]({
-						target: this,
-						mousePosition: fixedMousePosition,
-						mouse: this.scene.mouse
-					});
-
-					this.scene.mouse.wheelDirection = null;
-				}
-
-			} else {
-
-				if (this.eventStates.hasClicked) this.eventStates.hasClicked = false;
-
-				if (this.eventStates.hasEntered) {
-
-					if (typeof this.events["mouseOut"] === "function") this.events["mouseOut"]({
-						target: this,
-						mousePosition: fixedMousePosition,
-						mouse: this.scene.mouse
-					});
-
-					this.eventStates.hasLeft = true;
-					this.eventStates.hasEntered = false;
-				}
-
-			}
-
+			this._handleEventProperties(isInObject, fixedMousePosition);
 		}
+
+		if (typeof this.radius === "number") 
+			this._handleEventProperties(isMouseInCircle(fixedMousePosition.x, fixedMousePosition.y, this.x, this.y, this.radius), fixedMousePosition);
 
 	}
 
@@ -214,15 +336,35 @@ export class RenderObject implements RenderObjectConstructor {
 	}
 
 	/** Sets the position of this object using a method. */
-	public SetPosition(x: number, y: number): RenderObject {
+	public SetPosition(x: number | Vec2, y?: number): RenderObject {
 
+		if (x instanceof Vec2) {
+
+			this.x = x.x;
+			this.y = x.y;
+
+			return this;
+		}
+		
 		if (typeof this.x !== "number") throw new Error("Cannot set x-axis of object, as it does not exist or is not a number.");
 		if (typeof this.y !== "number") throw new Error("Cannot set y-axis of object, as it does not exist or is not a number.");
+
+		if (typeof x === "undefined" || typeof y === "undefined")
+			throw new Error();
 
 		this.x = x;
 		this.y = y;
 
 		return this;
+	}
+
+	/**
+	 * Returns a new Vec2 class provided with the position of this renderobject.
+	 * @returns
+	 */
+	public GetPosition(): Vec2 {
+
+		return new Vec2(this.x, this.y);
 	}
 
 	public SetFixedSize(width: number, height: number, position: Vector2) {
@@ -252,6 +394,14 @@ export class RenderObject implements RenderObjectConstructor {
 		this.height = height !== null ? height : this.height;
 
 		return this;
+	}
+
+	public SetSize(vector: Vec2) {
+
+		if (typeof this.width !== "number" || typeof this.height !== "number") return this;
+
+		this.width = vector.x;
+		this.height = vector.y;
 	}
 
 	/**
@@ -757,6 +907,49 @@ export class RenderObject implements RenderObjectConstructor {
 		}
 
 		return this.transform;
+	}
+
+	/**
+	 * Creates an style group to change the rendering styles of this object.
+	 * @param name Name of the styles
+	 * @param styles Styles
+	 */
+	public CreateStyleGroup(name: string, styles: RenderObjectStyles) {
+
+		if (typeof this.styleGroups[name] !== "undefined")
+			throw new Error(`Cannot overwrite style group since group named '${name}' already exist.`);
+
+		this.styleGroups[name] = styles;
+
+		return this;
+	}
+
+	public DeleteStyleGroup(name: string): RenderObject {
+
+		if (typeof this.styleGroups[name] === "undefined")
+			throw new Error(`Cannot delete style group '${name}' since it does not exist.`);
+
+		delete this.styleGroups[name];
+
+		return this;
+	}
+
+	/**
+	 * Uses a style group. Will throw an error if group does not exist.
+	 * @param name Name of the style group
+	 * @returns
+	 */
+	public UseStyleGroup(name: string): RenderObject {
+
+		if (typeof this.styleGroups[name] === "undefined")
+			throw new Error(`Cannot use style group '${name}' since it does not exist.`);
+
+		for (let key in this.styleGroups[name]) 
+			// @ts-ignore
+			this.SetStyle(key, this.styleGroups[name][key]);
+		
+
+		return this;
 	}
 
 	/** Fuckinf fucky fuck fuck fuck */

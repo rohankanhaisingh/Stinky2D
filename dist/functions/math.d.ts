@@ -52,6 +52,10 @@ export declare class Vec2 implements Vector2 {
     Dot(value: Vector2 | Vec2): number;
     ComputeAngle(): number;
     RotateAround(center: Vector2 | Vec2, angle: number): this;
+    ConvertPixelsToMeters(): Vec2;
+    SaveConvertPixelsToMeters(): Vec2;
+    ConvertMetersToPixels(): Vec2;
+    SaveConvertMetersToPixels(): Vec2;
 }
 export declare function Vec3(): Vector3;
 /**

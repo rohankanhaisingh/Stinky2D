@@ -282,6 +282,7 @@ class Renderer {
             throw new Error(`Failed to add renderobject (objectID: ${renderObject.id}) to renderer since it has already been added.`);
         renderObject.scene = this.scene;
         renderObject.renderer = this;
+        renderObject.arrayIndex = this.renderObjects.length;
         this.renderObjects.push(renderObject);
         renderObject.OnAdd(this);
         return renderObject;
@@ -357,6 +358,17 @@ class Renderer {
     }
     QuerySelector(selector) {
     }
+    /**
+     Sets the transformation matrix for the renderer.
+     
+     @param {number} horizontalScaling - The horizontal scaling factor.
+     @param {number} verticalSkewing - The vertical skewing factor.
+     @param {number} horizontalSkewing - The horizontal skewing factor.
+     @param {number} verticalScaling - The vertical scaling factor.
+     @param {number} horizontalTranslation - The horizontal translation value.
+     @param {number} verticalTranslation - The vertical translation value.
+     @returns {Renderer} - The updated renderer object.
+    */
     SetTransform(horizontalScaling, verticalSkewing, horizontalSkewing, verticalScaling, horizontalTranslation, verticalTranslation) {
         this.transform = [
             horizontalScaling,

@@ -1,5 +1,5 @@
 import { UniqueID } from "../functions/uid";
-import { DragMouseButton, DragOffsetType, RectangleConstructor, RectangleDragConfiguration, RenderObjectStyles, SceneConstructor } from "../typings";
+import { DragMouseButton, DragOffsetType, RectangleConstructor, RenderObjectDragConfiguration, RenderObjectStyles, SceneConstructor } from "../typings";
 import { RenderObject } from "./renderobject";
 import { Scene } from "./scene";
 
@@ -17,7 +17,7 @@ export class Rectangle extends RenderObject  implements RectangleConstructor{
 
 	public styles: RenderObjectStyles = {};
 
-	public dragConfig: RectangleDragConfiguration = {
+	public dragConfig: RenderObjectDragConfiguration = {
 		isEnabled: false,
 		offsetType: null,
 		scene: null,
@@ -64,7 +64,9 @@ export class Rectangle extends RenderObject  implements RectangleConstructor{
 		if (this.scaling !== null) ctx.scale(this.scaling.x, this.scaling.y);
 
 		if (this.transform !== null) {
-			if (this.transform.length !== 6) throw new Error("Failed to set transformation on object since property does not contain valid values.");
+
+			if (this.transform.length !== 6)
+				throw new Error("Failed to set transformation on object since property does not contain valid values.");
 
 			ctx.transform(this.transform[0], this.transform[1], this.transform[2], this.transform[3], this.transform[4], this.transform[5]);
 		}
@@ -75,12 +77,16 @@ export class Rectangle extends RenderObject  implements RectangleConstructor{
 		RenderObject.ApplyRenderStyles(ctx, this.styles);
 
 		if (this.styles.backgroundImage) {
+
 			ctx.drawImage(this.styles.backgroundImage, 0 - (this.width / 2), 0 - (this.height / 2), this.width, this.height);
 		} else {
-			if (typeof this.styles.backgroundColor === "string") ctx.fillRect(0 - (this.width / 2), 0 - (this.height / 2), this.width, this.height);
+
+			if (typeof this.styles.backgroundColor === "string")
+				ctx.fillRect(0 - (this.width / 2), 0 - (this.height / 2), this.width, this.height);
 		}
 
-		if (typeof this.styles.borderColor === "string") ctx.strokeRect(0 - (this.width / 2), 0 - (this.height / 2), this.width, this.height);
+		if (typeof this.styles.borderColor === "string")
+			ctx.strokeRect(0 - (this.width / 2), 0 - (this.height / 2), this.width, this.height);
 
 
 		ctx.closePath();

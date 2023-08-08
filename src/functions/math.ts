@@ -41,7 +41,7 @@ export function GetAverageArrayValue(arr: number[]) {
  * @param x2
  * @param y2
 */
-export function CalculateDistance(x1: number, y1: number, x2: number, y2: number) {
+export function CalculateDistance(x1: number, y1: number, x2: number, y2: number): number {
 
 
     let d1 = x2 - x1,
@@ -223,6 +223,44 @@ export class Vec2 implements Vector2 {
 
         this.x = x * c - y * s + center.x;
         this.y = x * s + y * c + center.y;
+
+        return this;
+    }
+
+    public ConvertPixelsToMeters(): Vec2 {
+
+        const x = this.x * (1 / 30),
+            y = this.y * (1 / 30);
+
+        return new Vec2(x, y);
+    }
+
+    public SaveConvertPixelsToMeters(): Vec2 {
+
+        const x = this.x * (1 / 30),
+            y = this.y * (1 / 30);
+
+        this.x = x;
+        this.y = y;
+
+        return this;
+    }
+
+    public ConvertMetersToPixels(): Vec2 {
+
+        const x = this.x * 30,
+            y = this.y * 30;
+
+        return new Vec2(x, y);
+    }
+
+    public SaveConvertMetersToPixels(): Vec2 {
+
+        const x = this.x * 30,
+            y = this.y * 30;
+
+        this.x = x;
+        this.y = y;
 
         return this;
     }

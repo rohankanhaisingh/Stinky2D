@@ -61,7 +61,7 @@ export function SimplifyImageData(imageData: ImageData): SimplifiedImageData {
 		colorSpace: imageData.colorSpace,
 		width: imageData.width,
 		height: imageData.height,
-		hex: ConvertByteArrayToHex([imageData.data[0], imageData.data[1], imageData.data[2]])
+		hex: "#" + ConvertByteArrayToHex([imageData.data[0], imageData.data[1], imageData.data[2]]).toUpperCase()
 	};
 }
 

@@ -1,6 +1,8 @@
 import { GetAverageArrayValue } from "../functions/math";
 import { UniqueID } from "../functions/uid";
+import { SceneConstructor } from "../typings";
 import { Renderer } from "./renderer";
+import { Scene } from "./scene";
 
 export class OffscreenRenderer {
 
@@ -79,5 +81,10 @@ export class OffscreenRenderer {
 	public UseGlowEffect(blurStrength: number, brightness: number) {
 
 		this.glowFilter = `blur(${blurStrength}px) brightness(${brightness * 100}%)`;
+	}
+
+	public CopyTexture(renderer: Renderer) {
+
+	
 	}
 }

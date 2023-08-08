@@ -261,5 +261,8 @@ class Scene {
         const y = this.canvasElement.height / 2;
         return new math_1.Vec2(x, y);
     }
+    GetRandomPosition() {
+        return new math_1.Vec2((0, math_1.RandomIntBetween)(0, this.width), (0, math_1.RandomIntBetween)(0, this.height));
+    }
 }
 exports.Scene = Scene;

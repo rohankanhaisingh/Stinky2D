@@ -154,6 +154,26 @@ class Vec2 {
         this.y = x * s + y * c + center.y;
         return this;
     }
+    ConvertPixelsToMeters() {
+        const x = this.x * (1 / 30), y = this.y * (1 / 30);
+        return new Vec2(x, y);
+    }
+    SaveConvertPixelsToMeters() {
+        const x = this.x * (1 / 30), y = this.y * (1 / 30);
+        this.x = x;
+        this.y = y;
+        return this;
+    }
+    ConvertMetersToPixels() {
+        const x = this.x * 30, y = this.y * 30;
+        return new Vec2(x, y);
+    }
+    SaveConvertMetersToPixels() {
+        const x = this.x * 30, y = this.y * 30;
+        this.x = x;
+        this.y = y;
+        return this;
+    }
 }
 exports.Vec2 = Vec2;
 function Vec3() {

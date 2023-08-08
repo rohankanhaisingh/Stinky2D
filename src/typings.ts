@@ -12,7 +12,6 @@ export type SceneAttributes = "keepSizeToWindow" | "disableContextMenu" | "redra
 export type SceneMouseWheelDirection = "up" | "down" | "left" | "right" | null;
 export type SceneEvents = "sceneResize" | "mouseDown" | "mouseUp" | "mouseMove" | "mouseOut" | "mouseEnter" | "mouseWheel";
 export type SceneImageFormat = "png" | "webp" | "jpeg" | "jpg";
-export type LooperOnUpdateEvent = (state: LooperTickState) => void;
 export type LooperEventNames = "update";
 export type AudioNode2DEvents = "end" | "play" | "playing" | "pause" | "update" | "load";
 export type AudioNode2DControllerNodes = BiquadFilterNode | StereoPannerNode | GainNode | AnalyserNode;
@@ -22,6 +21,7 @@ export type CollectionElementTypes = "string" | "number" | "bigint" | "boolean" 
 export type RenderObjectDataAttributes = "data-id" | "data-name" | "data-behavior" | "data-timestamp" | "data-appearance" | string;
 export type RenderObjectTransformProperty = "hozirontalScaling" | "verticalSkewing" | "horizontalSkewing" | "verticalScaling" | "horizontalTranslation" | "verticalTranslation";
 export type RenderMode = "firstToLast" | "lastToFirst";
+export type InputType = "keyup" | "keydown";
 
 /*
  * Interface representing an object that will be returned
@@ -260,15 +260,16 @@ export interface LooperConstructor {
  * of a 'Looper' instance, with properties defining the frame-rate, last registered timestamp,
  * the delta-time and the perfect set frame-rate which is 60 frames by default.
  */
-export interface LooperTickState {
+export interface LooperOnUpdateEvent {
 	readonly frameRate: number;
 	readonly lastTimestamp: number;
 	readonly deltaTime: number;
 	readonly perfectFrameRate: number;
+	readonly now: number;
 }
 
 export interface LooperEvents {
-	update: LooperOnUpdateEvent[];
+	update: ((ev: LooperOnUpdateEvent) => void)[];
 }
 
 export interface RectangleConstructor {
@@ -281,7 +282,7 @@ export interface RectangleConstructor {
 	styles: RenderObjectStyles;
 }
 
-export interface RectangleDragConfiguration {
+export interface RenderObjectDragConfiguration {
 	isEnabled: boolean;
 	offsetType: DragOffsetType | null;
 	scene: SceneConstructor | null;
@@ -383,9 +384,6 @@ export interface SimplifiedImageData {
 export interface RigidBody2DConstructor {
 	id: string;
 	timestamp: number;
-	position: Vec2 | Vector2;
-	velocity: Vec2 | Vector2;
-	acceleration: Vec2 | Vector2;
 }
 
 export interface PhysicsWorld2DConstructor {
@@ -575,6 +573,17 @@ export interface CompressorPresetsMap {
 export interface CopyRenderingOptions {
 	opacity?: number;
 	imageSmoothingEnabled?: boolean;
+}
+
+export interface InputEvent {
+	readonly timestamp: number;
+	readonly key: string;
+	readonly mode: InputType;
+}
+
+export interface CameraFocusAnimation {
+	animationName: EasingName;
+	animationDuration: number;
 }
 
 declare global {

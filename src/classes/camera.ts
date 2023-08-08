@@ -1,6 +1,9 @@
 import { Easings } from "../functions/easings";
-import { CameraConstructor, EasingName, RendererConstructor, SceneConstructor, Vector2 } from "../typings";
+import { AnimateInteger, Vec2 } from "../functions/math";
+import { CameraConstructor, CameraFocusAnimation, EasingName, RendererConstructor, SceneConstructor, Vector2 } from "../typings";
+import { Rectangle } from "./rectangle";
 import { Renderer } from "./renderer";
+import { RenderObject } from "./renderobject";
 import { Scene } from "./scene";
 
 export class Camera implements CameraConstructor {
@@ -57,6 +60,83 @@ export class Camera implements CameraConstructor {
 
 			this.x = -y;
 		}
+
+		return this;
+	}
+
+	/**
+	 * The `Focus` function takes a renderObject as input and adjusts the camera or context position to center it on the object within a given scene. 
+	 * It calculates the new x and y coordinates based on the scene dimensions and the renderObject's center. 
+	 * This ensures that the object remains centered in the scene, allowing the user or viewer to focus on it while other elements may be moving.
+	 * 
+	 * @param renderObject The object the camera should focus on.
+	 * @param scaling Sets the scaling level when focusing. This can be either a 'Vec2' class or a number. Null can be used to skip this paramater.
+	 * @param offset Sets the offset level when focusing. This can be either a 'Vec2' class or a number. Null can be used to skip this paramater.
+	 * @param animation Uses an animation to focus on the given render object.
+	 */
+	public Focus(renderObject: RenderObject, scaling: number | Vec2 | null, offset: number | Vec2 | null, animation?: CameraFocusAnimation): Camera {
+
+		const sceneWidth: number = this.scene.width,
+			sceneHeight: number = this.scene.height;
+
+		if (scaling !== null) {
+			if (animation) {
+
+				AnimateInteger(this.scaleX, scaling instanceof Vec2 ? scaling.x : scaling, animation.animationName, animation.animationDuration, scale => this.scaleX = scale);
+				AnimateInteger(this.scaleY, scaling instanceof Vec2 ? scaling.y : scaling, animation.animationName, animation.animationDuration, scale => this.scaleY = scale);
+			} else {
+
+				this.scaleX = scaling instanceof Vec2 ? scaling.x : scaling;
+				this.scaleY = scaling instanceof Vec2 ? scaling.y : scaling;
+			}
+		}
+
+		// Calculate the offset based on the scaling level.
+		let offsetX = 0;
+		let offsetY = 0;
+
+		if (offset !== null) {
+
+			offsetX = offset instanceof Vec2 ? offset.x : offset;
+			offsetY = offset instanceof Vec2 ? offset.y : offset;
+		}
+
+		const scaleX: number = scaling !== null ? (scaling instanceof Vec2 ? scaling.x : scaling) : this.scaleX;
+		const scaleY: number = scaling !== null ? (scaling instanceof Vec2 ? scaling.y : scaling) : this.scaleY;
+
+		// Calculate the scaled renderObject center position.
+		const scaledCenterX = renderObject instanceof Rectangle ? (renderObject.x + renderObject.width / 2) * scaleX : (renderObject.x + renderObject.radius) * scaleX;
+		const scaledCenterY = renderObject instanceof Rectangle ? (renderObject.y + renderObject.height / 2) * scaleY : (renderObject.y + renderObject.radius) * scaleY;
+
+		// Calculate the position to center the camera on the scaled renderObject.
+		const calculatedHorizontalPosition = -(scaledCenterX - sceneWidth / 2);
+		const calculatedVerticalPosition = -(scaledCenterY - sceneHeight / 2);
+
+		if (animation) {
+
+			AnimateInteger(this.x, calculatedHorizontalPosition + offsetX, animation.animationName, animation.animationDuration, pos => this.x = pos);
+			AnimateInteger(this.y, calculatedVerticalPosition + offsetY, animation.animationName, animation.animationDuration, pos => this.y = pos);
+		} else {
+
+			this.x = calculatedHorizontalPosition + offsetX;
+			this.y = calculatedVerticalPosition + offsetY;
+		}
+
+		return this;
+	}
+
+	public Scale(scaling: number | Vec2): Camera {
+
+		if (scaling instanceof Vec2) {
+
+			this.scaleX = scaling.x;
+			this.scaleY = scaling.y;
+
+			return this;
+		}
+
+		this.scaleX = scaling;
+		this.scaleY = scaling;
 
 		return this;
 	}

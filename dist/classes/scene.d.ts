@@ -72,4 +72,5 @@ export declare class Scene implements SceneConstructor {
      * Requires no arguments.
      */
     Center(): Vec2;
+    GetRandomPosition(): Vec2;
 }

@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RenderObject = exports.AllExistingRenderObjects = void 0;
 const colors_1 = require("../constants/colors");
 const easings_1 = require("../functions/easings");
+const math_1 = require("../functions/math");
 const uid_1 = require("../functions/uid");
 function checkSquareProperties(obj) {
     if (typeof obj.x === "number" && typeof obj.y === "number" &&
@@ -10,93 +11,104 @@ function checkSquareProperties(obj) {
         return true;
     return false;
 }
+function isMouseInCircle(mouseX, mouseY, circleX, circleY, circleRadius) {
+    const dx = mouseX - circleX, dy = mouseY - circleY, distance = Math.sqrt(dx * dx + dy * dy);
+    return distance <= circleRadius;
+}
 exports.AllExistingRenderObjects = [];
 class RenderObject {
     constructor() {
+        /** Unique generated id for each render object. */
         this.id = (0, uid_1.UniqueID)(18).id;
+        /** Counts the amount of render objects created in general. */
         this.exisitingObjectCount = exports.AllExistingRenderObjects.length + 1;
+        /** Timestamp of when the render object has been made. */
         this.timestamp = Date.now();
+        /** Array index of renderer instance. */
+        this.arrayIndex = 0;
+        /** Boolean which determines whether the object is visible or not. */
         this.visible = true;
+        /** Forces rendering outside the camera view/ */
         this.forceRendering = false;
+        /** Render object attributes. */
         this.attributes = {};
+        /** All events stored in this object. */
         this.events = {};
+        /** All events that will be emitted once. */
         this.eventsOnce = {};
-        this.eventStates = {
-            hasEntered: false,
-            hasLeft: false,
-            hasClicked: false,
-            isDown: false,
-            isUp: false
-        };
+        /** Event states.*/
+        this.eventStates = { hasEntered: false, hasLeft: false, hasClicked: false, isDown: false, isUp: false };
+        /** Render object children applied to this instance. */
         this.children = [];
+        /** Audio node applied to this instance. */
         this.audioNodes = [];
+        this.styleGroups = {};
         this.transform = null;
         this.scaling = null;
         exports.AllExistingRenderObjects.push(this);
     }
-    Draw(ctx) {
-        return 0;
-    }
-    Update(ctx, deltaTime) {
-        return 0;
-    }
-    OnAdd(renderer) {
-        return;
+    Draw(ctx) { return 0; }
+    Update(ctx, deltaTime) { return 0; }
+    OnAdd(renderer) { return; }
+    _handleEventProperties(isInObject, fixedMousePosition) {
+        if (isInObject) {
+            if (!this.eventStates.hasEntered) {
+                if (typeof this.events["mouseEnter"] === "function")
+                    this.events["mouseEnter"]({
+                        target: this,
+                        mousePosition: fixedMousePosition,
+                        mouse: this.scene.mouse
+                    });
+                this.eventStates.hasLeft = false;
+                this.eventStates.hasEntered = true;
+            }
+            if (this.scene.mouse.buttons.left || this.scene.mouse.buttons.middle || this.scene.mouse.buttons.right) {
+                if (!this.eventStates.isDown) {
+                    if (typeof this.events["mouseDown"] === "function")
+                        this.events["mouseDown"]({
+                            target: this,
+                            mousePosition: fixedMousePosition,
+                            mouse: this.scene.mouse
+                        });
+                    this.eventStates.isDown = true;
+                }
+                this.eventStates.isDown = false;
+                if (typeof this.events["mouseDown"] === "function")
+                    this.scene.mouse.buttons.resetState();
+            }
+            if (this.scene.mouse.wheelDirection !== null) {
+                if (typeof this.events["mouseWheel"] === "function")
+                    this.events["mouseWheel"]({
+                        target: this,
+                        mousePosition: fixedMousePosition,
+                        mouse: this.scene.mouse
+                    });
+                this.scene.mouse.wheelDirection = null;
+            }
+        }
+        else {
+            if (this.eventStates.hasClicked)
+                this.eventStates.hasClicked = false;
+            if (this.eventStates.hasEntered) {
+                if (typeof this.events["mouseOut"] === "function")
+                    this.events["mouseOut"]({
+                        target: this,
+                        mousePosition: fixedMousePosition,
+                        mouse: this.scene.mouse
+                    });
+                this.eventStates.hasLeft = true;
+                this.eventStates.hasEntered = false;
+            }
+        }
     }
     _updateOnMouseOverEvent() {
         const fixedMousePosition = this.scene.GetFixedMousePosition();
         if (typeof this.width === "number" && typeof this.height === "number") {
             const isInObject = fixedMousePosition.x >= this.x && fixedMousePosition.x <= this.x + this.width && fixedMousePosition.y >= this.y && fixedMousePosition.y <= this.y + this.height;
-            if (isInObject) {
-                if (!this.eventStates.hasEntered) {
-                    if (typeof this.events["mouseEnter"] === "function")
-                        this.events["mouseEnter"]({
-                            target: this,
-                            mousePosition: fixedMousePosition,
-                            mouse: this.scene.mouse
-                        });
-                    this.eventStates.hasLeft = false;
-                    this.eventStates.hasEntered = true;
-                }
-                if (this.scene.mouse.buttons.left || this.scene.mouse.buttons.middle || this.scene.mouse.buttons.right) {
-                    if (!this.eventStates.isDown) {
-                        if (typeof this.events["mouseDown"] === "function")
-                            this.events["mouseDown"]({
-                                target: this,
-                                mousePosition: fixedMousePosition,
-                                mouse: this.scene.mouse
-                            });
-                        this.eventStates.isDown = true;
-                    }
-                    this.eventStates.isDown = false;
-                    if (typeof this.events["mouseDown"] === "function")
-                        this.scene.mouse.buttons.resetState();
-                }
-                if (this.scene.mouse.wheelDirection !== null) {
-                    if (typeof this.events["mouseWheel"] === "function")
-                        this.events["mouseWheel"]({
-                            target: this,
-                            mousePosition: fixedMousePosition,
-                            mouse: this.scene.mouse
-                        });
-                    this.scene.mouse.wheelDirection = null;
-                }
-            }
-            else {
-                if (this.eventStates.hasClicked)
-                    this.eventStates.hasClicked = false;
-                if (this.eventStates.hasEntered) {
-                    if (typeof this.events["mouseOut"] === "function")
-                        this.events["mouseOut"]({
-                            target: this,
-                            mousePosition: fixedMousePosition,
-                            mouse: this.scene.mouse
-                        });
-                    this.eventStates.hasLeft = true;
-                    this.eventStates.hasEntered = false;
-                }
-            }
+            this._handleEventProperties(isInObject, fixedMousePosition);
         }
+        if (typeof this.radius === "number")
+            this._handleEventProperties(isMouseInCircle(fixedMousePosition.x, fixedMousePosition.y, this.x, this.y, this.radius), fixedMousePosition);
     }
     // =============== Public shit ===============
     UpdateEvents() {
@@ -127,13 +139,27 @@ class RenderObject {
     }
     /** Sets the position of this object using a method. */
     SetPosition(x, y) {
+        if (x instanceof math_1.Vec2) {
+            this.x = x.x;
+            this.y = x.y;
+            return this;
+        }
         if (typeof this.x !== "number")
             throw new Error("Cannot set x-axis of object, as it does not exist or is not a number.");
         if (typeof this.y !== "number")
             throw new Error("Cannot set y-axis of object, as it does not exist or is not a number.");
+        if (typeof x === "undefined" || typeof y === "undefined")
+            throw new Error();
         this.x = x;
         this.y = y;
         return this;
+    }
+    /**
+     * Returns a new Vec2 class provided with the position of this renderobject.
+     * @returns
+     */
+    GetPosition() {
+        return new math_1.Vec2(this.x, this.y);
     }
     SetFixedSize(width, height, position) {
         if (typeof this.x !== "number")
@@ -160,6 +186,12 @@ class RenderObject {
         this.width = width !== null ? width : this.width;
         this.height = height !== null ? height : this.height;
         return this;
+    }
+    SetSize(vector) {
+        if (typeof this.width !== "number" || typeof this.height !== "number")
+            return this;
+        this.width = vector.x;
+        this.height = vector.y;
     }
     /**
      * Animates the x position of this object to another specific x position.
@@ -550,6 +582,36 @@ class RenderObject {
             case "verticalTranslation": this.transform[5] = value;
         }
         return this.transform;
+    }
+    /**
+     * Creates an style group to change the rendering styles of this object.
+     * @param name Name of the styles
+     * @param styles Styles
+     */
+    CreateStyleGroup(name, styles) {
+        if (typeof this.styleGroups[name] !== "undefined")
+            throw new Error(`Cannot overwrite style group since group named '${name}' already exist.`);
+        this.styleGroups[name] = styles;
+        return this;
+    }
+    DeleteStyleGroup(name) {
+        if (typeof this.styleGroups[name] === "undefined")
+            throw new Error(`Cannot delete style group '${name}' since it does not exist.`);
+        delete this.styleGroups[name];
+        return this;
+    }
+    /**
+     * Uses a style group. Will throw an error if group does not exist.
+     * @param name Name of the style group
+     * @returns
+     */
+    UseStyleGroup(name) {
+        if (typeof this.styleGroups[name] === "undefined")
+            throw new Error(`Cannot use style group '${name}' since it does not exist.`);
+        for (let key in this.styleGroups[name])
+            // @ts-ignore
+            this.SetStyle(key, this.styleGroups[name][key]);
+        return this;
     }
     /** Fuckinf fucky fuck fuck fuck */
     static ApplyRenderStyles(ctx, styles) {

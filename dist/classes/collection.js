@@ -79,10 +79,9 @@ class Collection {
     }
     Has(object) {
         let isEqual = false;
-        for (let element of this.elements) {
+        for (let element of this.elements)
             if (element === object)
                 isEqual = true;
-        }
         return isEqual;
     }
     ToArray() {

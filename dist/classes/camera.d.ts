@@ -1,5 +1,7 @@
-import { CameraConstructor, EasingName, RendererConstructor, SceneConstructor, Vector2 } from "../typings";
+import { Vec2 } from "../functions/math";
+import { CameraConstructor, CameraFocusAnimation, EasingName, RendererConstructor, SceneConstructor, Vector2 } from "../typings";
 import { Renderer } from "./renderer";
+import { RenderObject } from "./renderobject";
 import { Scene } from "./scene";
 export declare class Camera implements CameraConstructor {
     x: number;
@@ -28,6 +30,18 @@ export declare class Camera implements CameraConstructor {
      * @param y
      */
     SetOffset(x: number | null, y: number | null): Camera;
+    /**
+     * The `Focus` function takes a renderObject as input and adjusts the camera or context position to center it on the object within a given scene.
+     * It calculates the new x and y coordinates based on the scene dimensions and the renderObject's center.
+     * This ensures that the object remains centered in the scene, allowing the user or viewer to focus on it while other elements may be moving.
+     *
+     * @param renderObject The object the camera should focus on.
+     * @param scaling Sets the scaling level when focusing. This can be either a 'Vec2' class or a number. Null can be used to skip this paramater.
+     * @param offset Sets the offset level when focusing. This can be either a 'Vec2' class or a number. Null can be used to skip this paramater.
+     * @param animation Uses an animation to focus on the given render object.
+     */
+    Focus(renderObject: RenderObject, scaling: number | Vec2 | null, offset: number | Vec2 | null, animation?: CameraFocusAnimation): Camera;
+    Scale(scaling: number | Vec2): Camera;
     /**
      * Animates the camera position from one position to another
      * @param from Starting position

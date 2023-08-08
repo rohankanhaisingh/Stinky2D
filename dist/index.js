@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AnimateInteger = exports.Vec3 = exports.Vec2 = exports.GetAverageArrayValue = exports.CalculateIntersection = exports.CalculateDistance = exports.CalculateAtan = exports.CalculateAngle = exports.RandomIntBetween = exports.LoadAudioSync = exports.SimplifyImageData = exports.LoadImageSync = exports.WaitFor = exports.Easings = exports.UniqueID = exports.FixedHexToRgbArray = exports.AnimateHeximalColor = exports.ConvertByteArrayToHex = exports.ConvertHexToByteArray = exports.RandomColor = exports.ColorCodes = exports.OffscreenRenderer = exports.GamepadHandler = exports.GamepadController = exports.Plugins = exports.PhysicsWorld2D = exports.RigidBody2D = exports.Collection = exports.AudioNode2D = exports.AudioSystem2D = exports.SpritesheetController = exports.LineSystem2D = exports.Line2D = exports.Geometry2D = exports.Circle = exports.TextNode = exports.Rectangle = exports.Looper = exports.Camera = exports.Renderer = exports.AllExistingRenderObjects = exports.RenderObject = exports.Scene = void 0;
+exports.GetKeyDown = exports.OnKeyUp = exports.OnKeyDown = exports.KeyUpListeners = exports.KeyDownListeners = exports.ActiveKeys = exports.AnimateInteger = exports.Vec3 = exports.Vec2 = exports.GetAverageArrayValue = exports.CalculateIntersection = exports.CalculateDistance = exports.CalculateAtan = exports.CalculateAngle = exports.RandomIntBetween = exports.LoadAudioSync = exports.SimplifyImageData = exports.LoadImageSync = exports.WaitFor = exports.Easings = exports.UniqueID = exports.FixedHexToRgbArray = exports.AnimateHeximalColor = exports.ConvertByteArrayToHex = exports.ConvertHexToByteArray = exports.RandomColor = exports.ColorCodes = exports.OffscreenRenderer = exports.GamepadHandler = exports.GamepadController = exports.Plugins = exports.PhysicsWorld2D = exports.RigidBody2D = exports.Collection = exports.AudioNode2D = exports.AudioSystem2D = exports.SpritesheetController = exports.LineSystem2D = exports.Line2D = exports.Geometry2D = exports.Circle = exports.TextNode = exports.Rectangle = exports.Looper = exports.Camera = exports.Renderer = exports.AllExistingRenderObjects = exports.RenderObject = exports.Scene = void 0;
 /**
  * Stinky2D library
  *
@@ -70,4 +70,11 @@ Object.defineProperty(exports, "GetAverageArrayValue", { enumerable: true, get: 
 Object.defineProperty(exports, "Vec2", { enumerable: true, get: function () { return math_1.Vec2; } });
 Object.defineProperty(exports, "Vec3", { enumerable: true, get: function () { return math_1.Vec3; } });
 Object.defineProperty(exports, "AnimateInteger", { enumerable: true, get: function () { return math_1.AnimateInteger; } });
+var keyboard_1 = require("./functions/keyboard");
+Object.defineProperty(exports, "ActiveKeys", { enumerable: true, get: function () { return keyboard_1.ActiveKeys; } });
+Object.defineProperty(exports, "KeyDownListeners", { enumerable: true, get: function () { return keyboard_1.KeyDownListeners; } });
+Object.defineProperty(exports, "KeyUpListeners", { enumerable: true, get: function () { return keyboard_1.KeyUpListeners; } });
+Object.defineProperty(exports, "OnKeyDown", { enumerable: true, get: function () { return keyboard_1.OnKeyDown; } });
+Object.defineProperty(exports, "OnKeyUp", { enumerable: true, get: function () { return keyboard_1.OnKeyUp; } });
+Object.defineProperty(exports, "GetKeyDown", { enumerable: true, get: function () { return keyboard_1.GetKeyDown; } });
 require("./constants/global");
